@@ -28,7 +28,7 @@
 [colon, :, 4]
 [integer, integer, 4]
 [var, var, 4]
-[self, self, 4]
+[self, self,q 4]
 [leq, <=, 5]
 [assign, =, 5]
 [opensqbr, [, 5]
@@ -59,7 +59,8 @@
 [id, a1bc, 27]
 [id, abc_1abc, 28]
 [id, abc1_abc, 29]
-[inlinecmt, // this is an inline comment, 31]
+[inlinecmt, // this is an inline comment
+, 31]
 [blockcmt, /* this is a single line block comment */, 33]
 [blockcmt, /* this is a 
 multiple line
