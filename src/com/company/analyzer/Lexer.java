@@ -4,11 +4,14 @@ import java.io.*;
 import java.util.*;
 
 public class Lexer {
-    public static int line = 1;
-    private char peek = ' ';
-    private HashSet<String> reserveWords = new HashSet<>();
+    public static int line;
+    private char peek;
+    private HashSet<String> reserveWords;
 
     public Lexer() {
+        line = 1;
+        peek = ' ';
+        reserveWords = new HashSet<>();
         reserveWords.add("if");
         reserveWords.add("public");
         reserveWords.add("read");
@@ -43,7 +46,7 @@ public class Lexer {
     public Token scan() throws IOException {
         for ( ;; readch()) {
             if (peek == ' ' || peek == '\t') continue;
-            else if (peek == '\n') line = line + 1;
+            else if (peek == '\n') line = line + 1 ;
             else if((int)peek == 65535) return null;
             else break;
         }
@@ -97,7 +100,41 @@ public class Lexer {
             case '*':
                 readch(); return new Token("mult", "*", line);
             case '/':
-                readch(); return new Token("div", "/", line);
+                readch();
+                if (peek == '/') {
+                    StringBuffer inLineComment = new StringBuffer("//");
+                    while(!readch ('\n')) {
+                        inLineComment.append(peek);
+                    }
+                    int startLine = line;
+                    line++;
+                    return new Token ("inlinecmt", inLineComment.toString (), startLine);
+                } else if(peek == '*') {
+                    int open = 1;
+                    StringBuffer blockComment = new StringBuffer("/*");
+                    while(true) {
+                        readch();
+                        blockComment.append(peek);
+
+                        String cmtstr = blockComment.toString();
+                        if(peek == '/' && cmtstr.charAt(cmtstr.length()-2) == '*') {
+                            open--;
+                        }
+                        else if(peek == '*' && cmtstr.charAt(cmtstr.length()-2) == '/') {
+                            open++;
+                        }
+                        if(open==0) {
+                            readch();
+                            int startLine = line;
+                            for(char ch: blockComment.toString().toCharArray()) {
+                                if(ch == '\n') line++;
+                            }
+                            return new Token ("blockcmt", blockComment.toString(), startLine);
+                        }
+                    }
+                } else {
+                    readch(); return new Token("div", "/", line);
+                }
             case '(':
                 readch(); return new Token("openpar", "(", line);
             case ')':
@@ -174,7 +211,7 @@ public class Lexer {
                     return new Token("floatnum", num.toString(), line);
                 }
             }
-            return new Token("invalidnum", num.toString (), line);
+            return new Token("invalidnum", num.toString(), line);
         }
 
         if (Character.isLetter(peek) ) {
@@ -190,7 +227,11 @@ public class Lexer {
             return new Token ("id", s, line);
         }
 
-        Token t = new Token(peek+"", "invalidchar", line);
+        if((int)peek == 13) {
+            readch();
+            return scan();
+        }
+        Token t = new Token("invalidchar", peek+"", line);
         peek = ' ';
         return t;
     }
