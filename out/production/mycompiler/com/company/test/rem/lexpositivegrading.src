@@ -1,3 +1,7 @@
+_abc
+0123
+
+
 ==	+	|	(	;	if 	public	read
 <>	-	&	)	,	then	private	write
 <	*	!	{	.	else	func	return
@@ -8,7 +12,7 @@
 
 	
 
-
+1.234e04
 
 0
 1

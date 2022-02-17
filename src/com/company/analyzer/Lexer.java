@@ -57,7 +57,6 @@ public class Lexer {
                     readch();
                     return new Token ("eq", "==", line);
                 } else {
-                    readch();
                     return new Token ("assign", "=", line);
                 }
             case '<':
@@ -76,7 +75,6 @@ public class Lexer {
                     readch();
                     return new Token ("geq", ">=", line);
                 } else {
-                    readch();
                     return new Token ("gt", ">", line);
                 }
             case ':':
@@ -84,7 +82,6 @@ public class Lexer {
                     readch();
                     return new Token ("coloncolon", "::", line);
                 } else {
-                    readch();
                     return new Token ("colon", ":", line);
                 }
             case '+':
@@ -94,7 +91,6 @@ public class Lexer {
                     readch();
                     return new Token ("arrow", "->", line);
                 } else {
-                    readch();
                     return new Token ("minus", "-", line);
                 }
             case '*':
@@ -159,18 +155,25 @@ public class Lexer {
                 readch(); return new Token("and", "&", line);
             case '!':
                 readch(); return new Token("not", "!", line);
+            case '$':
+                readch(); return new Token("$", "$", line);
         }
 
         if (Character.isDigit(peek)) {
             StringBuffer num = new StringBuffer();
             if(this.peek == '0') {
-                readch ();
-                return new Token("intnum", "0", line);
-            }
-            do {
                 num.append(peek);
-                readch();
-            } while (Character.isDigit(peek));
+                readch ();
+                if (this.peek != '.') {
+                    return new Token("intnum", "0", line);
+                }
+            }
+            if (this.peek != '.') {
+                do {
+                    num.append(peek);
+                    readch();
+                } while (Character.isDigit(peek));
+            }
 
             if (this.peek != '.') {
                 return new Token ("intnum", num.toString(), line);
