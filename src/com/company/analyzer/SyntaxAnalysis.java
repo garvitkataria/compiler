@@ -133,7 +133,6 @@ public class SyntaxAnalysis
             if(token == null) return;
             lookahead = token.type;
         }
-//        writeOutDerivation("\nToken: "+token);
         currentTokenIndex = currentTokenIndex + 1;
     }
 
