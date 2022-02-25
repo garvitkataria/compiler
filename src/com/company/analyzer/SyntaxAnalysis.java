@@ -1,11 +1,21 @@
 package com.company.analyzer;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 public class SyntaxAnalysis
 {
+
+    class Node {
+        String label;
+        List<Node> Children;
+
+        public Node(String label) {
+            this.label = label;
+            Children = new ArrayList<>();
+        }
+    }
+
     private String lookahead = null;
     private int currentTokenIndex = 0;
     private boolean error = false;
@@ -14,6 +24,54 @@ public class SyntaxAnalysis
     Token token = null;
     FileWriter outderivation = null;
     FileWriter outsyntaxerrors = null;
+    Node root = null;
+    static Stack<Node> st = new Stack<>();
+
+    public boolean pushInStack(String label) {
+        st.push(new Node(label));
+        return true;
+    }
+
+    public boolean popFromStack(String label, int noOfChildren) {
+        Node parent = new Node(label);
+        System.out.print ("popFromStack: "+ label+": ");
+        while(noOfChildren>0 && st.size ()>0) {
+            parent.Children.add(st.peek());
+            System.out.print (st.peek().label+" ");
+            st.pop();
+            noOfChildren--;
+        }
+        System.out.println ();
+        st.push(parent);
+        return true;
+    }
+
+    public boolean popFromStackUntilEpsilon(String label) {
+        Node parent = new Node(label);
+        System.out.print ("popFromStackUntilEpsilon: "+ label+": ");
+        while(!st.peek().label.equals("epsilon")) {
+            parent.Children.add(st.peek());
+            System.out.print (st.peek().label+" ");
+            st.pop();
+        }
+        st.pop();
+        System.out.println ();
+        st.push(parent);
+        return true;
+    }
+
+    public static void printAST(Node node) {
+        System.out.println(node.label);
+        System.out.print("Children: ");
+        for(Node child: node.Children) {
+            System.out.print (child.label+" ");
+        }
+        System.out.println("==========");
+        for(Node child: node.Children) {
+            printAST(child);
+        }
+    }
+
     SyntaxAnalysis(Lexer lexer) {
         this.lex = lexer;
         tokenTypesToIgnore.add("inlinecmt");
@@ -40,7 +98,7 @@ public class SyntaxAnalysis
 
         try {
             this.outderivation.write(str+"\n");
-            System.out.print(str+"\n");
+            //System.out.print(str+"\n");
         } catch (IOException e) {
             e.printStackTrace ();
         }
@@ -48,7 +106,7 @@ public class SyntaxAnalysis
     private void writeOutDerivationNoLineBreak(String str) {
         try {
             this.outderivation.write(str);
-            System.out.print (str);
+            //System.out.print (str);
         } catch (IOException e) {
             e.printStackTrace ();
         }
@@ -57,7 +115,7 @@ public class SyntaxAnalysis
     public void writeOutSyntaxErrors(String str) {
         try {
             this.outsyntaxerrors.write(str+"\n");
-            System.out.print (str+"\n");
+            //System.out.print (str+"\n");
         } catch (IOException e) {
             e.printStackTrace ();
         }
@@ -97,8 +155,9 @@ public class SyntaxAnalysis
         boolean error = false;
         if (firstSet.contains(lookahead))
         {
-            if (PROG())
-                writeOutDerivation("START -> PROG");
+            if (PROG() && popFromStack("prog", 1)) {
+                writeOutDerivation ("START -> PROG");
+            }
             else
                 error = true;
         }
@@ -325,13 +384,14 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("public") || lookahead.equals("private"))
         {
-            if (VISIBILITY() && MEMBERDECL() && REPTSTRUCTDECL4())
+            if (VISIBILITY() && MEMBERDECL() && pushInStack("membDecl") && REPTSTRUCTDECL4())
                 writeOutDerivation("REPTSTRUCTDECL4 -> VISIBILITY MEMBERDECL REPTSTRUCTDECL4");
             else
                 error = true;
         }
-        else if (lookahead.equals("closecubr"))
+        else if (lookahead.equals("closecubr")) {
             writeOutDerivation("REPTSTRUCTDECL4 -> epsilon");
+        }
         else
             error = true;
 
@@ -1018,14 +1078,14 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("inherits"))
         {
-            if (Match("inherits") && Match("id") && REPTOPTSTRUCTDECL22())
+            if (Match("inherits") && Match("id") && pushInStack("id") && REPTOPTSTRUCTDECL22())
                 writeOutDerivation("OPTSTRUCTDECL2 -> inherits id REPTOPTSTRUCTDECL22");
             else
                 error = true;
         }
-        else if (lookahead.equals("opencubr"))
+        else if (lookahead.equals("opencubr")) {
             writeOutDerivation("OPTSTRUCTDECL2 -> epsilon");
-
+        }
         else
             error = true;
 
@@ -1040,13 +1100,14 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("comma"))
         {
-            if (Match("comma") && Match("id") && REPTOPTSTRUCTDECL22())
+            if (Match("comma") && Match("id") && pushInStack("id") && REPTOPTSTRUCTDECL22())
                 writeOutDerivation("REPTOPTSTRUCTDECL22 -> comma id REPTOPTSTRUCTDECL22");
             else
                 error = true;
         }
-        else if (lookahead.equals("opencubr"))
-            writeOutDerivation("REPTOPTSTRUCTDECL22 -> epsilon");
+        else if (lookahead.equals("opencubr")) {
+            writeOutDerivation ("REPTOPTSTRUCTDECL22 -> epsilon");
+        }
 
         else
             error = true;
@@ -1062,7 +1123,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func") || lookahead.equals("impl") || lookahead.equals("struct"))
         {
-            if (REPTPROG0())
+            if (pushInStack("epsilon") && REPTPROG0() && popFromStackUntilEpsilon("STRUCTORIMPLORFUNCLIST"))
                 writeOutDerivation("PROG -> REPTPROG0");
             else
                 error = true;
@@ -1087,8 +1148,9 @@ public class SyntaxAnalysis
             else
                 error = true;
         }
-        else if (lookahead.equals("$"))
-            writeOutDerivation("REPTPROG0 -> epsilon");
+        else if (lookahead.equals("$")) {
+            writeOutDerivation ("REPTPROG0 -> epsilon");
+        }
 
         else
             error = true;
@@ -1391,7 +1453,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("struct"))
         {
-            if (Match("struct") && Match("id") && optstructDecl2() && Match("opencubr") && REPTSTRUCTDECL4() && Match("closecubr") && Match("semi"))
+            if (Match("struct") && Match("id") && pushInStack("id") && pushInStack("epsilon") && optstructDecl2() && popFromStackUntilEpsilon("inheritList") && Match("opencubr") && pushInStack("epsilon") && REPTSTRUCTDECL4() && popFromStackUntilEpsilon("memberList") && Match("closecubr") && Match("semi"))
                 writeOutDerivation("STRUCTDECL -> struct id OPTSTRUCTDECL2 lcurbr REPTSTRUCTDECL4 rcurbr semi");
 
             else
@@ -1411,23 +1473,26 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func"))
         {
-            if (FUNCDEF())
-                writeOutDerivation("STRUCTORIMPLORFUNC -> FUNCDEF");
-
+            if (FUNCDEF() && pushInStack("funcDecl")) {
+                writeOutDerivation ("STRUCTORIMPLORFUNC -> FUNCDEF");
+            }
             else
                 error = true;
         }
         else if (lookahead.equals("impl"))
         {
-            if (IMPLDEF())
-                writeOutDerivation("STRUCTORIMPLORFUNC -> IMPLDEF");
+            if (IMPLDEF()) {
+                writeOutDerivation ("STRUCTORIMPLORFUNC -> IMPLDEF");
+                pushInStack("implDecl");
+            }
             else
                 error = true;
         }
         else if (lookahead.equals("struct"))
         {
-            if (STRUCTDECL())
-                writeOutDerivation("STRUCTORIMPLORFUNC -> STRUCTDECL");
+            if (STRUCTDECL() && popFromStack("structDecl", 3)) {
+                writeOutDerivation ("STRUCTORIMPLORFUNC -> STRUCTDECL");
+            }
             else
                 error = true;
         }
@@ -1641,6 +1706,8 @@ public class SyntaxAnalysis
                         Lexer lex = new Lexer();
                         SyntaxAnalysis sa = new SyntaxAnalysis(lex);
                         System.out.println (sa.Parse(outderivation, outsyntaxerrors));
+                        System.out.println (sa.st.size());
+                        printAST(sa.st.peek());
                         System.out.println ("=====================\n\n");
                     }
                 }
