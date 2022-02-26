@@ -384,7 +384,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("public") || lookahead.equals("private"))
         {
-            if (VISIBILITY() && MEMBERDECL() && pushInStack("membDecl") && REPTSTRUCTDECL4())
+            if (VISIBILITY() && MEMBERDECL() && popFromStack ("membDecl", 1) && REPTSTRUCTDECL4())
                 writeOutDerivation("REPTSTRUCTDECL4 -> VISIBILITY MEMBERDECL REPTSTRUCTDECL4");
             else
                 error = true;
@@ -446,7 +446,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("intnum"))
         {
-            if (Match("intnum") && Match("closesqbr"))
+            if (Match("intnum") && pushInStack("num") && Match("closesqbr"))
                 writeOutDerivation("ARRAYDASH -> intnum rsqbr");
             else
                 error = true;
@@ -533,7 +533,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("id"))
         {
-            if (Match("id") && Match("colon") && TYPE() && REPTFPARAMS3() && REPTFPARAMS4())
+            if (Match("id") && pushInStack("id") && Match("colon") && TYPE() && pushInStack("epsilon") && REPTFPARAMS3() && popFromStackUntilEpsilon("dimList") && popFromStack ("fparam", 3) && REPTFPARAMS4())
                 writeOutDerivation("FPARAMS -> id colon TYPE REPTFPARAMS3 REPTFPARAMS4");
             else
                 error = true;
@@ -555,7 +555,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("comma"))
         {
-            if (FPARAMSTAIL() && REPTFPARAMS4())
+            if (FPARAMSTAIL() && popFromStack ("fparam", 3) && REPTFPARAMS4())
                 writeOutDerivation("REPTFPARAMS4 -> FPARAMSTAIL REPTFPARAMS4");
             else
                 error = true;
@@ -599,7 +599,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("comma"))
         {
-            if (Match("comma") && Match("id") && Match("colon") && TYPE() && REPTFPARAMSTAIL4())
+            if (Match("comma") && Match("id") && pushInStack("id") && Match("colon") && TYPE() && pushInStack("epsilon") && REPTFPARAMSTAIL4() && popFromStackUntilEpsilon("dimList"))
                 writeOutDerivation("FPARAMSTAIL -> comma id colon TYPE REPTFPARAMSTAIL4");
             else
                 error = true;
@@ -866,7 +866,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func"))
         {
-            if (Match("func") && Match("id") && Match("openpar") && FPARAMS() && Match("closepar") && Match("arrow") && RETURNTYPE())
+            if (Match("func") && Match("id") && pushInStack("id") && Match("openpar") && pushInStack("epsilon") && FPARAMS() && popFromStackUntilEpsilon("fparamList") && Match("closepar") && Match("arrow") && RETURNTYPE())
                 writeOutDerivation("FUNCHEAD -> func id lpar FPARAMS rpar arrow RETURNTYPE");
             else
                 error = true;
@@ -1019,14 +1019,14 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func"))
         {
-            if (FUNCDECL())
+            if (FUNCDECL() && popFromStack("funcDecl", 3))
                 writeOutDerivation("MEMBERDECL -> FUNCDECL");
             else
                 error = true;
         }
         else if (lookahead.equals("let"))
         {
-            if (VARDECL())
+            if (VARDECL() && popFromStack ("varDecl", 3))
                 writeOutDerivation("MEMBERDECL -> VARDECL");
             else
                 error = true;
@@ -1245,7 +1245,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("void"))
         {
-            if (Match("void"))
+            if (Match("void") && pushInStack("type"))
                 writeOutDerivation("RETURNTYPE -> void");
             else
                 error = true;
@@ -1530,21 +1530,21 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("integer"))
         {
-            if (Match("integer"))
+            if (Match("integer") && pushInStack("type"))
                 writeOutDerivation("TYPE -> integer");
             else
                 error = true;
         }
         else if (lookahead.equals("float"))
         {
-            if (Match("float"))
+            if (Match("float") && pushInStack("type"))
                 writeOutDerivation("TYPE -> float");
             else
                 error = true;
         }
         else if (lookahead.equals("id"))
         {
-            if (Match("id"))
+            if (Match("id") && pushInStack("type"))
                 writeOutDerivation("TYPE -> id");
             else
                 error = true;
@@ -1563,7 +1563,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("let"))
         {
-            if (Match("let") && Match("id") && Match("colon") && TYPE() && REPTVARDECL4() && Match("semi"))
+            if (Match("let") && Match("id") && pushInStack("id") && Match("colon") && TYPE() && pushInStack("epsilon") && REPTVARDECL4() && popFromStackUntilEpsilon("dimList") && Match("semi"))
                 writeOutDerivation("VARDECL -> let id colon TYPE REPTVARDECL4 semi");
             else
                 error = true;
