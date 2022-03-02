@@ -60,15 +60,12 @@ public class SyntaxAnalysis
         return true;
     }
 
-    public static void printAST(Node node) {
-        System.out.println(node.label);
-        System.out.print("Children: ");
+    public static void printAST(Node node, int depth, FileWriter outast) throws IOException {
+        for(int i=0; i<depth; i++)
+            outast.write("|\t");
+        outast.write(node.label+"\n");
         for(Node child: node.Children) {
-            System.out.print (child.label+" ");
-        }
-        System.out.println("==========");
-        for(Node child: node.Children) {
-            printAST(child);
+            printAST(child, depth+1, outast);
         }
     }
 
@@ -321,7 +318,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("plus") || lookahead.equals("minus") || lookahead.equals("or"))
         {
-            if (ADDOP() && TERM() && RIGHTRECARITHEXPR())
+            if (ADDOP() && TERM() && popFromStack("addOp", 2) && RIGHTRECARITHEXPR())
                 writeOutDerivation("RIGHTRECARITHEXPR -> ADDOP TERM RIGHTRECARITHEXPR");
             else
                 error = true;
@@ -342,7 +339,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("mult") || lookahead.equals("div") || lookahead.equals("and"))
         {
-            if (MULTOP() && FACTOR() && RIGHTRECTERM())
+            if (MULTOP() && FACTOR() && popFromStack("multOp", 2) && RIGHTRECTERM())
                 writeOutDerivation("RIGHTRECTERM -> MULTOP FACTOR RIGHTRECTERM");
             else
                 error = true;
@@ -384,7 +381,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("public") || lookahead.equals("private"))
         {
-            if (VISIBILITY() && MEMBERDECL() && popFromStack ("membDecl", 1) && REPTSTRUCTDECL4())
+            if (VISIBILITY() && pushInStack("visibility") && MEMBERDECL() && popFromStack ("membDecl", 2) && REPTSTRUCTDECL4())
                 writeOutDerivation("REPTSTRUCTDECL4 -> VISIBILITY MEMBERDECL REPTSTRUCTDECL4");
             else
                 error = true;
@@ -511,7 +508,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("eq") || lookahead.equals("neq") || lookahead.equals("lt") || lookahead.equals("gt") || lookahead.equals("leq") || lookahead.equals("geq"))
         {
-            if (RELOP() && ARITHEXPR())
+            if (RELOP() && ARITHEXPR() && popFromStack("relExp", 3))
                 writeOutDerivation("EXPRDASH -> RELOP ARITHEXPR");
             else
                 error = true;
@@ -640,7 +637,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("intnum"))
         {
-            if (Match("intnum"))
+            if (Match("intnum") && pushInStack("intlit"))
                 writeOutDerivation("FACTOR -> intnum");
             else
                 error = true;
@@ -648,7 +645,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("floatnum"))
         {
-            if (Match("floatnum"))
+            if (Match("floatnum") && pushInStack("floatnum"))
                 writeOutDerivation("FACTOR -> floatnum");
 
             else
@@ -657,7 +654,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("id"))
         {
-            if (REPTVARIABLE0() && FACTORDASH())
+            if (pushInStack("epsilon") && pushInStack("epsilon") && REPTVARIABLE0() && pushInStack("id") && popFromStackUntilEpsilon("var0") && FACTORDASH() && popFromStackUntilEpsilon("functionCall/DataMember"))
                 writeOutDerivation("FACTOR -> REPTVARIABLE0 id FACTORDASH");
             else
                 error = true;
@@ -673,7 +670,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("minus"))
         {
-            if (SIGN() && FACTOR())
+            if (SIGN() && FACTOR() && popFromStack("sign", 1))
                 writeOutDerivation("FACTOR -> SIGN FACTOR");
             else
                 error = true;
@@ -681,7 +678,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("plus"))
         {
-            if (SIGN() && FACTOR())
+            if (SIGN() && FACTOR() && popFromStack("sign", 1))
                 writeOutDerivation("FACTOR -> SIGN FACTOR");
             else
                 error = true;
@@ -689,7 +686,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("not"))
         {
-            if (Match("not") && FACTOR())
+            if (Match("not") && FACTOR() && popFromStack("not", 1))
                 writeOutDerivation("FACTOR -> not FACTOR");
             else
                 error = true;
@@ -737,14 +734,14 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("openpar"))
         {
-            if (Match("openpar") && APARAMS() && Match("closepar"))
+            if (Match("openpar") && pushInStack("epsilon") && APARAMS() && popFromStackUntilEpsilon("aParams") && Match("closepar"))
                 writeOutDerivation("FACTORDASH -> lpar APARAMS rpar");
             else
                 error = true;
         }
         else if (lookahead.equals("opensqbr"))
         {
-            if (REPTVARIABLE2())
+            if (pushInStack("epsilon") && REPTVARIABLE2() && popFromStackUntilEpsilon("indiceList"))
                 writeOutDerivation("FACTORDASH -> REPTVARIABLE2");
             else
                 error = true;
@@ -786,7 +783,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("opencubr"))
         {
-            if (Match("opencubr") && REPTFUNCBODY1() && Match("closecubr"))
+            if (Match("opencubr") && pushInStack("epsilon") && REPTFUNCBODY1() && popFromStackUntilEpsilon("statementBlock") && Match("closecubr"))
                 writeOutDerivation("FUNCBODY -> lcurbr REPTFUNCBODY1 rcurbr ");
             else
                 error = true;
@@ -885,7 +882,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("dot"))
         {
-            if (IDNESTDASH())
+            if (pushInStack("id") && IDNESTDASH())
                 writeOutDerivation("IDNEST-> id IDNESTDASH");
 
             else
@@ -905,21 +902,21 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("openpar"))
         {
-            if (Match("openpar") && APARAMS() && Match("closepar") && Match("dot"))
+            if (Match("openpar") && pushInStack("epsilon") && APARAMS() && popFromStackUntilEpsilon("aParams") && Match("closepar") && Match("dot") && popFromStack("dot", 2))
                 writeOutDerivation("IDNESTDASH -> lpar APARAMS rpar dot");
             else
                 error = true;
         }
         else if (lookahead.equals("opensqbr"))
         {
-            if (REPTIDNEST1() && Match("dot"))
+            if (pushInStack("epsilon") && REPTIDNEST1() && popFromStackUntilEpsilon("indiceList") && Match("dot") && popFromStack("dot", 2))
                 writeOutDerivation("IDNESTDASH -> REPTIDNEST1 dot");
             else
                 error = true;
         }
         else if (lookahead.equals("dot"))
         {
-            if (REPTIDNEST1() && Match("dot"))
+            if (pushInStack("epsilon") && REPTIDNEST1() && popFromStackUntilEpsilon("indiceList") && Match("dot") && popFromStack("dot", 2))
                 writeOutDerivation("IDNESTDASH -> REPTIDNEST1 dot");
             else
                 error = true;
@@ -959,7 +956,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("impl"))
         {
-            if (Match("impl") && Match("id") && Match("opencubr") && REPTIMPLDEF3() && Match("closecubr"))
+            if (Match("impl") && Match("id") && pushInStack("id") && Match("opencubr") && pushInStack("epsilon") && REPTIMPLDEF3() && popFromStackUntilEpsilon("funcDefList") && Match("closecubr"))
                 writeOutDerivation("IMPLDEF -> impl id lcurbr REPTIMPLDEF3 rcurbr");
             else
                 error = true;
@@ -978,7 +975,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func"))
         {
-            if (FUNCDEF() && REPTIMPLDEF3())
+            if (FUNCDEF() && popFromStack("funcDef",4) && REPTIMPLDEF3())
                 writeOutDerivation("REPTIMPLDEF3 -> FUNCDEF REPTIMPLDEF3 ");
             else
                 error = true;
@@ -1166,7 +1163,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("intnum") || lookahead.equals("floatnum") || lookahead.equals("openpar") || lookahead.equals("not") || lookahead.equals("id") || lookahead.equals("plus") || lookahead.equals("minus"))
         {
-            if (ARITHEXPR() && RELOP() && ARITHEXPR())
+            if (ARITHEXPR() && RELOP() && ARITHEXPR() && popFromStack("relExpr", 3))
                 writeOutDerivation("RELEXPR -> ARITHEXPR RELOP ARITHEXPR");
             else
                 error = true;
@@ -1185,7 +1182,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("eq"))
         {
-            if (Match("eq"))
+            if (Match("eq") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> eq");
 
             else
@@ -1193,7 +1190,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("neq"))
         {
-            if (Match("neq"))
+            if (Match("neq") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> neq");
 
             else
@@ -1201,7 +1198,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("lt"))
         {
-            if (Match("lt"))
+            if (Match("lt") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> lt");
 
             else
@@ -1209,7 +1206,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("gt"))
         {
-            if (Match("gt"))
+            if (Match("gt") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> gt");
 
             else
@@ -1217,7 +1214,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("leq"))
         {
-            if (Match("leq"))
+            if (Match("leq") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> leq");
 
             else
@@ -1225,7 +1222,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("geq"))
         {
-            if (Match("geq"))
+            if (Match("geq") && pushInStack("relOp"))
                 writeOutDerivation("RELOP -> geq");
             else
                 error = true;
@@ -1360,7 +1357,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("id"))
         {
-            if (REPTVARIABLE0() && STATEMENTDASH())
+            if (pushInStack("epsilon") && REPTVARIABLE0() && pushInStack ("id") && popFromStackUntilEpsilon("var0") && STATEMENTDASH())
                 writeOutDerivation("STATEMENT -> REPTVARIABLE0 id STATEMENTDASH");
             else
                 error = true;
@@ -1368,7 +1365,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("return"))
         {
-            if (Match("return") && Match("openpar") && EXPR() && Match("closepar") && Match("semi"))
+            if (Match("return") && Match("openpar") && EXPR() && Match("closepar") && Match("semi") && popFromStack("returnStatement", 1))
                 writeOutDerivation("STATEMENT -> return lpar EXPR rpar semi");
             else
                 error = true;
@@ -1376,7 +1373,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("write"))
         {
-            if (Match("write") && Match("openpar") && EXPR() && Match("closepar") && Match("semi"))
+            if (Match("write") && Match("openpar") && EXPR() && Match("closepar") && Match("semi") && popFromStack("writeStatement", 1))
                 writeOutDerivation("STATEMENT -> write lpar EXPR rpar semi");
             else
                 error = true;
@@ -1384,7 +1381,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("read"))
         {
-            if (Match("read") && Match("openpar") && VARIABLE() && Match("closepar") && Match("semi"))
+            if (Match("read") && Match("openpar") && VARIABLE() && Match("closepar") && Match("semi") && popFromStack("readStatement", 1))
                 writeOutDerivation("STATEMENT -> read lpar VARIABLE rpar semi");
             else
                 error = true;
@@ -1392,7 +1389,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("while"))
         {
-            if (Match("while") && Match("openpar") && RELEXPR() && Match("closepar") && STATBLOCK() && Match("semi"))
+            if (Match("while") && Match("openpar") && RELEXPR() && Match("closepar") && pushInStack("epsilon") && STATBLOCK() && popFromStackUntilEpsilon("statementBlock") && Match("semi") && popFromStack("whileStatement", 2))
                 writeOutDerivation("STATEMENT -> while lpar RELEXPR rpar STATBLOCK semi");
             else
                 error = true;
@@ -1400,7 +1397,7 @@ public class SyntaxAnalysis
 
         else if (lookahead.equals("if"))
         {
-            if (Match("if") && Match("openpar") && RELEXPR() && Match("closepar") && Match("then") && STATBLOCK() && Match("else") && STATBLOCK() && Match("semi"))
+            if (Match("if") && Match("openpar") && RELEXPR() && Match("closepar") && Match("then") && pushInStack("epsilon") && STATBLOCK() && popFromStackUntilEpsilon("statementBlock") && Match("else") && pushInStack("epsilon") && STATBLOCK() && popFromStackUntilEpsilon("statementBlock") && Match("semi") && popFromStack("ifStatement", 3))
                 writeOutDerivation("STATEMENT -> if lpar RELEXPR rpar then STATBLOCK else STATBLOCK semi");
             else
                 error = true;
@@ -1420,21 +1417,21 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("openpar"))
         {
-            if (Match("openpar") && APARAMS() && Match("closepar") && Match("semi"))
+            if (Match("openpar") && pushInStack("epsilon") && APARAMS() && popFromStackUntilEpsilon ("aParams") && Match("closepar") && Match("semi") && popFromStack("fcallStatement", 2))
                 writeOutDerivation("STATEMENTDASH -> lpar APARAMS rpar semi");
             else
                 error = true;
         }
         else if (lookahead.equals("opensqbr"))
         {
-            if (REPTVARIABLE2() && ASSIGNOP() && EXPR() && Match("semi"))
+            if ( pushInStack("epsilon") && REPTVARIABLE2() && popFromStackUntilEpsilon("indiceList") && popFromStack("var", 2) && ASSIGNOP() && EXPR() && Match("semi") && popFromStack("assignStatement", 2))
                 writeOutDerivation("STATEMENTDASH -> REPTVARIABLE2 ASSIGNOP EXPR semi");
             else
                 error = true;
         }
         else if (lookahead.equals("assign"))
         {
-            if (REPTVARIABLE2() && ASSIGNOP() && EXPR() && Match("semi"))
+            if ( pushInStack("epsilon") && REPTVARIABLE2() && popFromStackUntilEpsilon("indiceList") && popFromStack("var", 2) && ASSIGNOP() && EXPR() && Match("semi") && popFromStack("assignStatement", 2))
                 writeOutDerivation("STATEMENTDASH -> REPTVARIABLE2 ASSIGNOP EXPR semi");
             else
                 error = true;
@@ -1473,7 +1470,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("func"))
         {
-            if (FUNCDEF() && pushInStack("funcDecl")) {
+            if (FUNCDEF() && popFromStack("funcDef", 4)) {
                 writeOutDerivation ("STRUCTORIMPLORFUNC -> FUNCDEF");
             }
             else
@@ -1481,9 +1478,8 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("impl"))
         {
-            if (IMPLDEF()) {
+            if (IMPLDEF() && popFromStack("implDecl", 2)) {
                 writeOutDerivation ("STRUCTORIMPLORFUNC -> IMPLDEF");
-                pushInStack("implDecl");
             }
             else
                 error = true;
@@ -1644,7 +1640,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("id"))
         {
-            if (REPTVARIABLE0() && REPTVARIABLE2())
+            if (pushInStack("epsilon") && pushInStack("epsilon") && REPTVARIABLE0() && pushInStack("id") && popFromStackUntilEpsilon("var0") && pushInStack("epsilon") && REPTVARIABLE2() && popFromStackUntilEpsilon("indiceList") && popFromStackUntilEpsilon("variable"))
                 writeOutDerivation("VARIABLE -> REPTVARIABLE0 id REPTVARIABLE2");
             else
                 error = true;
@@ -1685,6 +1681,7 @@ public class SyntaxAnalysis
     public static void main(String[] args) throws FileNotFoundException {
         FileWriter outsyntaxerrors = null;
         FileWriter outderivation = null;
+        FileWriter outast = null;
         try {
             File folder = new File("src/com/company/test/input_dir");
             File[] listOfFiles = folder.listFiles();
@@ -1700,6 +1697,7 @@ public class SyntaxAnalysis
                         try {
                             outsyntaxerrors = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outsyntaxerrors");
                             outderivation = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outderivation");
+                            outast = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outast");
                         } catch (IOException e) {
                             e.printStackTrace ();
                         }
@@ -1707,13 +1705,18 @@ public class SyntaxAnalysis
                         SyntaxAnalysis sa = new SyntaxAnalysis(lex);
                         System.out.println (sa.Parse(outderivation, outsyntaxerrors));
                         System.out.println (sa.st.size());
-                        printAST(sa.st.peek());
+                        try {
+                            printAST(sa.st.peek(), 0, outast);
+                        } catch (IOException e) {
+                            e.printStackTrace ();
+                        }
                         System.out.println ("=====================\n\n");
                     }
                 }
                 try {
                     outderivation.close();
                     outsyntaxerrors.close();
+                    outast.close ();
                 } catch (IOException e) {
                     e.printStackTrace ();
                 }

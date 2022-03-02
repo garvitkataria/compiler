@@ -1,0 +1,405 @@
+|	prog
+|	|	STRUCTORIMPLORFUNCLIST
+|	|	|	funcDef
+|	|	|	|	statementBlock
+|	|	|	|	|	whileStatement
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	writeStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	aParams
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	writeStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	aParams
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	writeStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	relExpr
+|	|	|	|	|	|	|	intlit
+|	|	|	|	|	|	|	relOp
+|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	assignStatement
+|	|	|	|	|	|	intlit
+|	|	|	|	|	|	var
+|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	assignStatement
+|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	aParams
+|	|	|	|	|	|	|	|	floatnum
+|	|	|	|	|	|	|	|	floatnum
+|	|	|	|	|	|	|	|	sign
+|	|	|	|	|	|	|	|	|	floatnum
+|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	var
+|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	assignStatement
+|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	aParams
+|	|	|	|	|	|	|	|	floatnum
+|	|	|	|	|	|	|	|	intlit
+|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	var
+|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	dimList
+|	|	|	|	|	type
+|	|	|	|	|	id
+|	|	|	|	|	dimList
+|	|	|	|	|	type
+|	|	|	|	|	id
+|	|	|	|	|	dimList
+|	|	|	|	|	type
+|	|	|	|	|	id
+|	|	|	|	type
+|	|	|	|	fparamList
+|	|	|	|	id
+|	|	|	implDecl
+|	|	|	|	funcDefList
+|	|	|	|	|	funcDef
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	returnStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	addOp
+|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	multOp
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	floatnum
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	type
+|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	id
+|	|	|	|	|	funcDef
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	returnStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	type
+|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	id
+|	|	|	|	id
+|	|	|	implDecl
+|	|	|	|	funcDefList
+|	|	|	|	|	funcDef
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	returnStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	dot
+|	|	|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	type
+|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	id
+|	|	|	|	|	funcDef
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	returnStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	addOp
+|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	multOp
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	addOp
+|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	multOp
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	assignStatement
+|	|	|	|	|	|	|	|	functionCall/DataMember
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	var
+|	|	|	|	|	|	|	|	|	indiceList
+|	|	|	|	|	|	|	|	|	var0
+|	|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	type
+|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	id
+|	|	|	|	id
+|	|	|	implDecl
+|	|	|	|	funcDefList
+|	|	|	|	|	funcDef
+|	|	|	|	|	|	statementBlock
+|	|	|	|	|	|	|	returnStatement
+|	|	|	|	|	|	|	|	intlit
+|	|	|	|	|	|	type
+|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	id
+|	|	|	|	id
+|	|	|	structDecl
+|	|	|	|	memberList
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	funcDecl
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	funcDecl
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	varDecl
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	varDecl
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	varDecl
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	inheritList
+|	|	|	|	|	id
+|	|	|	|	id
+|	|	|	structDecl
+|	|	|	|	memberList
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	funcDecl
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	funcDecl
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	varDecl
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	varDecl
+|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	inheritList
+|	|	|	|	|	id
+|	|	|	|	id
+|	|	|	structDecl
+|	|	|	|	memberList
+|	|	|	|	|	membDecl
+|	|	|	|	|	|	funcDecl
+|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	fparamList
+|	|	|	|	|	|	|	|	fparam
+|	|	|	|	|	|	|	|	|	dimList
+|	|	|	|	|	|	|	|	|	type
+|	|	|	|	|	|	|	|	|	id
+|	|	|	|	|	|	|	id
+|	|	|	|	|	|	visibility
+|	|	|	|	inheritList
+|	|	|	|	id
