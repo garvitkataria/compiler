@@ -8,10 +8,17 @@ public class SyntaxAnalysis
 
     class Node {
         String label;
+        String value;
         List<Node> Children;
 
         public Node(String label) {
             this.label = label;
+            this.value = null;
+            Children = new ArrayList<>();
+        }
+        public Node(String label, String value) {
+            this.label = label;
+            this.value = value;
             Children = new ArrayList<>();
         }
     }
@@ -21,19 +28,21 @@ public class SyntaxAnalysis
     private boolean error = false;
     HashSet<String> tokenTypesToIgnore = new HashSet<>();
     Lexer lex;
+    Token prevtoken = null;
     Token token = null;
     FileWriter outderivation = null;
     FileWriter outsyntaxerrors = null;
     Node root = null;
-    static Stack<Node> st = new Stack<>();
+    static Stack<Node> st;
 
     public boolean pushInStack(String label) {
-        st.push(new Node(label));
+        if(prevtoken != null) st.push(new Node(label, prevtoken.value));
+        else st.push(new Node(label));
         return true;
     }
 
     public boolean popFromStack(String label, int noOfChildren) {
-        Node parent = new Node(label);
+        Node parent = new Node(label, token.value);
         System.out.print ("popFromStack: "+ label+": ");
         while(noOfChildren>0 && st.size ()>0) {
             parent.Children.add(st.peek());
@@ -47,7 +56,7 @@ public class SyntaxAnalysis
     }
 
     public boolean popFromStackUntilEpsilon(String label) {
-        Node parent = new Node(label);
+        Node parent = new Node(label, token.value);
         System.out.print ("popFromStackUntilEpsilon: "+ label+": ");
         while(!st.peek().label.equals("epsilon")) {
             parent.Children.add(st.peek());
@@ -63,13 +72,14 @@ public class SyntaxAnalysis
     public static void printAST(Node node, int depth, FileWriter outast) throws IOException {
         for(int i=0; i<depth; i++)
             outast.write("|\t");
-        outast.write(node.label+"\n");
+        outast.write(node.label+" - "+node.value+"\n");
         for(Node child: node.Children) {
             printAST(child, depth+1, outast);
         }
     }
 
     SyntaxAnalysis(Lexer lexer) {
+        st = new Stack<>();
         this.lex = lexer;
         tokenTypesToIgnore.add("inlinecmt");
         tokenTypesToIgnore.add("blockcmt");
@@ -180,6 +190,7 @@ public class SyntaxAnalysis
     }
 
     private void GetNextToken() throws IOException {
+        prevtoken = token;
         token = lex.scan();
         if(token == null) return;
         lookahead = token.type;
