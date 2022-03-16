@@ -5,24 +5,6 @@ import java.util.*;
 
 public class SyntaxAnalysis
 {
-
-    class Node {
-        String label;
-        String value;
-        List<Node> Children;
-
-        public Node(String label) {
-            this.label = label;
-            this.value = null;
-            Children = new ArrayList<>();
-        }
-        public Node(String label, String value) {
-            this.label = label;
-            this.value = value;
-            Children = new ArrayList<>();
-        }
-    }
-
     private String lookahead = null;
     private int currentTokenIndex = 0;
     private boolean error = false;
@@ -36,13 +18,13 @@ public class SyntaxAnalysis
     static Stack<Node> st;
 
     public boolean pushInStack(String label) {
-        if(prevtoken != null) st.push(new Node(label, prevtoken.value));
+        if(prevtoken != null) st.push(new Node(label, prevtoken.value, token.line));
         else st.push(new Node(label));
         return true;
     }
 
     public boolean popFromStack(String label, int noOfChildren) {
-        Node parent = new Node(label, token.value);
+        Node parent = new Node(label, token.value, token.line);
         System.out.print ("popFromStack: "+ label+": ");
         while(noOfChildren>0 && st.size ()>0) {
             parent.Children.add(st.peek());
@@ -56,7 +38,7 @@ public class SyntaxAnalysis
     }
 
     public boolean popFromStackUntilEpsilon(String label) {
-        Node parent = new Node(label, token.value);
+        Node parent = new Node(label, token.value, token.line);
         System.out.print ("popFromStackUntilEpsilon: "+ label+": ");
         while(!st.peek().label.equals("epsilon")) {
             parent.Children.add(st.peek());
@@ -72,7 +54,7 @@ public class SyntaxAnalysis
     public static void printAST(Node node, int depth, FileWriter outast) throws IOException {
         for(int i=0; i<depth; i++)
             outast.write("|\t");
-        outast.write(node.label+" - "+node.value+"\n");
+        outast.write(node.label+"(value: "+node.value+", line:"+node.line+")\n");
         for(Node child: node.Children) {
             printAST(child, depth+1, outast);
         }
