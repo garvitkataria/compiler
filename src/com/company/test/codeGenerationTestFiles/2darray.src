@@ -1,0 +1,33 @@
+func main() -> void {
+    let n: integer;
+    let m: integer;
+    m = 5;
+    n = 5;
+
+    let arr: integer[5][8];
+
+    let i: integer;
+    let j: integer;
+    i = 0;
+    while(i < n){
+        j = 0;
+        while(j < m){
+            arr[i][j] = 5;
+            arr[1][2] = 5;
+            j = j + 1;
+        };
+       i = i + 1;
+    };
+
+    i = 0;
+    while(i < n){
+        j = 0;
+        while(j < m){
+            write(arr[i][j]);
+            j = j + 1;
+        };
+       i = i + 1;
+    };
+
+}
+$

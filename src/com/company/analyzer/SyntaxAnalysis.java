@@ -14,8 +14,8 @@ public class SyntaxAnalysis
     Token token = null;
     FileWriter outderivation = null;
     FileWriter outsyntaxerrors = null;
-    Node root = null;
-    static Stack<Node> st;
+    public Node root = null;
+    public static Stack<Node> st;
 
     public boolean pushInStack(String label) {
         if(prevtoken != null) st.push(new Node(label, prevtoken.value, token.line));
@@ -60,7 +60,7 @@ public class SyntaxAnalysis
         }
     }
 
-    SyntaxAnalysis(Lexer lexer) {
+    public SyntaxAnalysis(Lexer lexer) {
         st = new Stack<>();
         this.lex = lexer;
         tokenTypesToIgnore.add("inlinecmt");
@@ -174,6 +174,8 @@ public class SyntaxAnalysis
     private void GetNextToken() throws IOException {
         prevtoken = token;
         token = lex.scan();
+        System.out.println("prevtoken"+prevtoken);
+        System.out.println("token"+token);
         if(token == null) return;
         lookahead = token.type;
 
@@ -257,21 +259,21 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("plus"))
         {
-            if (Match("plus"))
+            if (Match("plus") && pushInStack("opr"))
                 writeOutDerivation("ADDOP -> plus");
             else
                 error = true;
         }
         else if (lookahead.equals("minus"))
         {
-            if (Match("minus"))
+            if (Match("minus") && pushInStack("opr"))
                 writeOutDerivation("ADDOP -> minus");
             else
                 error = true;
         }
         else if (lookahead.equals("or"))
         {
-            if (Match("or"))
+            if (Match("or") && pushInStack("opr"))
                 writeOutDerivation("ADDOP -> or");
             else
                 error = true;
@@ -311,7 +313,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("plus") || lookahead.equals("minus") || lookahead.equals("or"))
         {
-            if (ADDOP() && TERM() && popFromStack("addOp", 2) && RIGHTRECARITHEXPR())
+            if (ADDOP() && TERM() && popFromStack("addOp", 3) && RIGHTRECARITHEXPR())
                 writeOutDerivation("RIGHTRECARITHEXPR -> ADDOP TERM RIGHTRECARITHEXPR");
             else
                 error = true;
@@ -332,7 +334,7 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("mult") || lookahead.equals("div") || lookahead.equals("and"))
         {
-            if (MULTOP() && FACTOR() && popFromStack("multOp", 2) && RIGHTRECTERM())
+            if (MULTOP() && FACTOR() && popFromStack("multOp", 3) && RIGHTRECTERM())
                 writeOutDerivation("RIGHTRECTERM -> MULTOP FACTOR RIGHTRECTERM");
             else
                 error = true;
@@ -1035,21 +1037,21 @@ public class SyntaxAnalysis
         boolean error = false;
         if (lookahead.equals("mult"))
         {
-            if (Match("mult"))
+            if (Match("mult") && pushInStack("opr"))
                 writeOutDerivation("MULTOP -> mult");
             else
                 error = true;
         }
         else if (lookahead.equals("div"))
         {
-            if (Match("div"))
+            if (Match("div") && pushInStack("opr"))
                 writeOutDerivation("MULTOP -> div");
             else
                 error = true;
         }
         else if (lookahead.equals("and"))
         {
-            if (Match("and"))
+            if (Match("and") && pushInStack("opr"))
                 writeOutDerivation("MULTOP -> and");
             else
                 error = true;
@@ -1578,7 +1580,7 @@ public class SyntaxAnalysis
         }
         else if (lookahead.equals("let"))
         {
-            if (VARDECL())
+            if (VARDECL() && popFromStack ("varDecl", 3))
                 writeOutDerivation("VARDECLORSTAT -> VARDECL");
             else
                 error = true;

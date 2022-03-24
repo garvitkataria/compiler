@@ -1,0 +1,13 @@
+func main() -> void {
+    let n1: integer;
+    let n2: integer;
+    n1 = 7;
+    n2 = 209;
+    if (((n1-6) * 100) >= ((n2+9) / 2)) then {
+        n = 8;
+    } else {
+        n = 2;
+    };
+    write(n);
+}
+$

@@ -129,7 +129,7 @@ public class Lexer {
                         }
                     }
                 } else {
-                    readch(); return new Token("div", "/", line);
+                    return new Token("div", "/", line);
                 }
             case '(':
                 readch(); return new Token("openpar", "(", line);

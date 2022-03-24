@@ -9,29 +9,31 @@ public class SymbolTableGenerator {
     public SymbolTableGenerator(FileWriter outsymboltables) {
         this.outsymboltables = outsymboltables;
     }
-    public void PrintSymbolTable(Node pNode) throws IOException {
+
+    public Node PrintSymbolTable(Node pNode) throws IOException {
+        Node temp = new Node();
+        temp = pNode;
         List<Node> listNodes = Find(pNode.Children, "STRUCTORIMPLORFUNCLIST").Children;
         for (Node node : listNodes) {
-
+            node.m_symtab = InitializeDataTable();
             if(node.label.equals("structDecl")) {
-                WriteClassTable(node, listNodes);
+                Node result = WriteClassTable(node, listNodes);
             }
             else if(node.label.equals("funcDef")) {
-                WriteFunctionTable (node, null, "", "", "");
+                Node result = WriteFunctionTable (node, null, null, "", "", "");
             }
         }
+        return pNode;
     }
 
-    private void WriteClassTable(Node node, List<Node> listNodes) throws IOException {
-//        Node defnitionNode = node.Children.Find(x => x.label == "id");
+    private Node WriteClassTable(Node node, List<Node> listNodes) throws IOException {
+        node.entry = new SymbolEntry();
         Node defnitionNode = Find(node.Children, "id");
         outsymboltables.write("| class     | " + defnitionNode.value + "\n");
         outsymboltables.write("|    ==============================================================================\n");
         outsymboltables.write("|     | table: " + defnitionNode.value + "\n");
         outsymboltables.write("|    ==============================================================================\n");
 
-
-//        Node inheritNode = node.Children.Find(x => x.label == "inheritList");
         Node inheritNode = Find(node.Children, "inheritList");
         if (inheritNode.Children != null && inheritNode.Children.size () > 0)
         {
@@ -39,13 +41,18 @@ public class SymbolTableGenerator {
             for (Node inheritChildNode : inheritNode.Children)
             {
                 inheritText = inheritText + inheritChildNode.value;
+                node.entry.NodeType = "Class";
+                node.entry.Name = defnitionNode.value;
+                node.entry.Inherits = inheritChildNode.value;
             }
             outsymboltables.write(inheritText + "\n");
         }
         else
             outsymboltables.write("|     | inherit     | none \n");
-        WriteClassVariable(node);
-        WriteClassMethods(node, listNodes, defnitionNode.value);
+        node = WriteClassVariable(node, node);
+        node = WriteClassMethods(node, listNodes, node, defnitionNode.value);
+
+        return node;
     }
 
     private Node Find(List<Node> children, String strEq) {
@@ -57,22 +64,24 @@ public class SymbolTableGenerator {
         return null;
     }
 
-    private void WriteClassMethods(Node node, List<Node> rootNodes, String className) throws IOException {
-        for (Node childNode : node.Children)
-        {
-            if (childNode.label.equals("funcDecl"))
-            {
-                String visibility = Find(node.Children, "visibility").value;
-                String funcName = Find(childNode.Children, "id").value;
-                WriteFunctionTable(childNode, rootNodes, className, visibility, funcName);
+    private Node WriteClassMethods(Node node, List<Node> rootNodes, Node rootClassNode, String className) throws IOException {
+        Node memListNode = Find(node.Children, "memberList");
+        for (Node childNode : memListNode.Children) {
+            for (Node child : childNode.Children) {
+                if (child.label == "funcDecl")
+                {
+                    String visibility = Find(childNode.Children, "visibility").value;
+                    String funcName = Find(child.Children, "id").value;
+                    rootClassNode = WriteFunctionTable(child, rootNodes, rootClassNode, className, visibility, funcName);
+                }
             }
-            WriteClassMethods(childNode, rootNodes, className);
         }
+        return rootClassNode;
     }
 
-    private void WriteFunctionTable(Node node, List<Node> rootNodes, String className, String visibility, String funcName) throws IOException {
+    private Node WriteFunctionTable(Node node, List<Node> rootNodes, Node rootClassNode, String className, String visibility, String funcName) throws IOException {
         if (className.equals("")) {
-            MethodWriting(node, "");
+            return MethodWriting(node, null, "", "");
         }
         else {
             if (rootNodes != null) {
@@ -86,11 +95,12 @@ public class SymbolTableGenerator {
                         List<Node> listOfFuncDef = FindAll(funcDefListNode.Children,"funcDef");
                         for (Node funcDefNode : listOfFuncDef) {
                             if (Find(funcDefNode.Children, "id").value.equals(funcName))
-                                MethodWriting(funcDefNode, visibility);
+                                rootClassNode = MethodWriting(funcDefNode, rootClassNode, className, visibility);
                         }
                     }
                 }
             }
+            return rootClassNode;
         }
     }
 
@@ -104,25 +114,60 @@ public class SymbolTableGenerator {
         return ll;
     }
 
-    private void MethodWriting(Node node, String visibility) throws IOException {
+    private Node MethodWriting(Node node, Node rootClassNode, String ClassName, String visibility) throws IOException {
         Node defnitionNode = Find(node.Children, "id");
         Node defnitionType = Find(node.Children, "type");
         Node defnitionParam = Find(node.Children, "fparamList");
+        Node tempNode = new Node();
         if (defnitionNode != null)
         {
+            tempNode.entry = new SymbolEntry();
+            tempNode.entry.NodeType = "Function";
+            tempNode.entry.Name = defnitionNode.value;
+            tempNode.entry.NodeVisibility = visibility;
+            tempNode.entry.ReturnType = defnitionType.value;
+
             outsymboltables.write("| function   | " + defnitionNode.value);
             if (defnitionParam != null && defnitionParam.Children.size() > 0)
             {
                 String fparamString = "     | (";
                 for (Node paramNode : defnitionParam.Children)
                 {
-                    if (paramNode.Children != null && paramNode.Children.size () > 0)
+                    if (paramNode.Children != null && paramNode.Children.size() > 0)
                     {
                         fparamString = fparamString + Find(paramNode.Children, "type").value;
-                        if (Find(paramNode.Children, "dimList").Children.size () > 0)
-                            fparamString = fparamString + "[], ";
+                        int DimListNodeCount = Find(paramNode.Children, "dimList").Children.size();
+                        if (DimListNodeCount > 0)
+                        {
+                            for (int i = 0; i < DimListNodeCount; i++)
+                            {
+                                fparamString = fparamString + "[]";
+                            }
+                            fparamString = fparamString + " ,";
+                        }
                         else
                             fparamString = fparamString + ", ";
+                        tempNode.entry.ParameterName = Find(paramNode.Children, "id").value;
+                        tempNode.entry.ParameterType = Find(paramNode.Children, "type").value;
+                        for (int i = 0; i < DimListNodeCount; i++)
+                        {
+                            tempNode.entry.ParameterType = tempNode.entry.ParameterType + "[]";
+                        }
+
+
+                        if (rootClassNode == null)
+                        {
+                            node.entry = tempNode.entry;
+                            node.m_symtab = AddNewRow(node.m_symtab, node.entry);
+                        }
+                        else
+                        {
+                            rootClassNode.entry = tempNode.entry;
+                            rootClassNode.entry.ParentClass = ClassName;
+                            rootClassNode.m_symtab = AddNewRow(rootClassNode.m_symtab, rootClassNode.entry);
+                        }
+
+
                     }
                 }
                 fparamString = fparamString.trim();
@@ -131,36 +176,72 @@ public class SymbolTableGenerator {
             }
             else
                 outsymboltables.write("     | ()");
-
             if (defnitionType != null)
-                outsymboltables.write(": " + defnitionType.value );
+                outsymboltables.write(": " + defnitionType.value);
 
             if (!visibility.equals(""))
                 outsymboltables.write("  | " + visibility + "\n");
-            else
-                outsymboltables.write("\n");
+                else
+            outsymboltables.write( "\n");
 
             outsymboltables.write("|    ==============================================================================\n");
             outsymboltables.write("|     | table: " + defnitionNode.value + "\n");
             outsymboltables.write("|    ==============================================================================\n");
+
+
+
+
         }
-        for (Node childNode : node.Children) {
-            if (childNode.label.equals("statementBlock"))
+        for (Node childNode: node.Children)
+        {
+            if (childNode.label == "statementBlock")
             {
-                for (Node variableNode : childNode.Children)
+                for (Node variableNode: childNode.Children)
                 {
                     if (variableNode.label == "id")
                     {
                         int variableNodeIndex = IndexOf(childNode.Children, variableNode);
-                        String type = childNode.Children.get(variableNodeIndex - 1).value;
-                        String dimListNode = (childNode.Children.get(variableNodeIndex - 2).Children.size() > 0) ? "[]" : "";
-                        outsymboltables.write( "|     | local      | " + variableNode.value + "      | " + type + dimListNode + "\n");
+                        String type = childNode.Children.get (variableNodeIndex - 1).value;
+                        int dimListNodeCount = childNode.Children.get (variableNodeIndex - 2).Children.size();
+                        String dimListNode = "";
+                        for (int i = 0; i < dimListNodeCount; i++)
+                        {
+                            dimListNode = dimListNode + "[]";
+                        }
+                        outsymboltables.write("|     | local      | " + variableNode.value + "      | " + type + dimListNode + "\n");
+
+                        if (rootClassNode == null)
+                        {
+                            if (node.entry == null)
+                                node.entry = tempNode.entry;
+                            node.entry.ParameterType = "";
+                            node.entry.ParameterName = "";
+                            node.entry.VariableName = variableNode.value;
+                            node.entry.VariableType = type + dimListNode;
+                            node.m_symtab = AddNewRow(node.m_symtab, node.entry);
+                        }
+                        else
+                        {
+                            if (rootClassNode.entry == null)
+                                rootClassNode.entry = tempNode.entry;
+                            rootClassNode.entry.ParentClass = ClassName;
+                            rootClassNode.entry.ParameterType = "";
+                            rootClassNode.entry.ParameterName = "";
+                            rootClassNode.entry.VariableName = variableNode.value;
+                            rootClassNode.entry.VariableType = type + dimListNode;
+                            rootClassNode.m_symtab = AddNewRow(rootClassNode.m_symtab, rootClassNode.entry);
+                        }
                     }
                 }
             }
         }
         outsymboltables.write("===================================================================================\n");
+        if (rootClassNode != null)
+            return rootClassNode;
+        else
+            return node;
     }
+
 
     private int IndexOf(List<Node> children, Node variableNode) {
         int i=0;
@@ -171,26 +252,31 @@ public class SymbolTableGenerator {
         return -1;
     }
 
-    private void WriteClassVariable(Node node) throws IOException {
-        for (Node childNode : node.Children)
-        {
-            if (childNode.label.equals("varDecl"))
-            {
-                String visibility = Find(node.Children, "visibility").value;
-                WriteVariableTable(childNode, visibility);
+    private Node WriteClassVariable(Node node, Node rootClassNode) throws IOException {
+        for (Node childNode : node.Children) {
+            for (Node child: childNode.Children) {
+                if (child.label == "varDecl") {
+                    String visibility = Find(childNode.Children, "visibility").value;
+                    rootClassNode = WriteVariableTable(child, visibility, rootClassNode);
+                }
             }
-            WriteClassVariable(childNode);
         }
+        return rootClassNode;
     }
 
-    private void WriteVariableTable(Node childNode, String visibility) throws IOException {
+    private Node WriteVariableTable(Node childNode, String visibility, Node rootClassNode) throws IOException {
 
         Node idNode = Find(childNode.Children, "id");
         Node typeNode = Find(childNode.Children, "type");
         if (idNode != null && typeNode != null)
         {
+            rootClassNode.entry.VariableName = idNode.value;
+            rootClassNode.entry.VariableType = typeNode.value;
+            rootClassNode.entry.VarVisibility = visibility;
+            rootClassNode.m_symtab = AddNewRow(rootClassNode.m_symtab, rootClassNode.entry);
             outsymboltables.write("|     | data      | " + idNode.value + "      | " + typeNode.value + "  | " + visibility + "\n");
         }
+        return rootClassNode;
     }
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -235,6 +321,7 @@ public class SymbolTableGenerator {
                         outsymboltables.write("===================================================================================\n");
                         symbolTableGenerator.PrintSymbolTable(syntaxAnalysis.root);
 
+                        printAST2(syntaxAnalysis.root, 0);
                     }
                 }
                 try {
@@ -251,6 +338,27 @@ public class SymbolTableGenerator {
             System.out.println(err.getMessage());
         } catch (IOException e) {
             e.printStackTrace ();
+        }
+    }
+
+    public Table InitializeDataTable()
+    {
+        Table table = new Table();
+        return table;
+    }
+
+    public Table AddNewRow(Table table, SymbolEntry entryFields)
+    {
+        table.addNewRow(entryFields);
+        return table;
+    }
+
+    public static void printAST2(Node node, int depth) throws IOException {
+        for(int i=0; i<depth; i++)
+            System.out.print("|\t");
+        System.out.println(node.label + " - "+node.m_symtab);
+        for(Node child: node.Children) {
+            printAST2(child, depth+1);
         }
     }
 }
