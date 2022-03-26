@@ -51,8 +51,10 @@ public class Main {
                         outsymboltables.write("===================================================================================\n");
                         symbolTableGenerator.PrintSymbolTable(syntaxAnalysis.root);
 
-                        CodeGenerator codeGenerator = new CodeGenerator(moon);
+                        StringBuilder moonsb = new StringBuilder ();
+                        CodeGenerator codeGenerator = new CodeGenerator(moon, moonsb);
                         codeGenerator.generate(syntaxAnalysis.root);
+                        moon.write (moonsb.toString ());
                     }
                 }
                 try {

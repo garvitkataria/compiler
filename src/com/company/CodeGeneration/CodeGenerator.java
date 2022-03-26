@@ -8,8 +8,10 @@ import java.util.List;
 
 public class CodeGenerator {
     FileWriter moon = null;
-    public CodeGenerator(FileWriter moon) {
+    StringBuilder moonsb = null;
+    public CodeGenerator(FileWriter moon, StringBuilder moonsb) {
         this.moon = moon;
+        this.moonsb = moonsb;
     }
 
     public void generate(Node root) {
@@ -39,7 +41,7 @@ public class CodeGenerator {
                 funcName = child.value;
             }
         }
-        System.out.println(funcName+" "+fparamList);
+        moonsb.insert(0,funcName+" "+fparamList + "\n");
     }
 
     private List<String> getFparamList(Node node) {
@@ -70,7 +72,7 @@ public class CodeGenerator {
     }
 
     private void generateIfStatementCode(Node node) {
-        System.out.println("====generateIfStatementCode====");
+        moonsb.insert(0, "====generateIfStatementCode====\n");
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
                 generateStatementBlockCode(child);
@@ -79,11 +81,11 @@ public class CodeGenerator {
                 generateRelExprCode(child);
             }
         }
-        System.out.println("generateIfStatementCode");
+        moonsb.insert(0, "generateIfStatementCode\n");
     }
 
     private void generateRelExprCode(Node node) {
-        System.out.println ("====generateRelExprCode====");
+        moonsb.insert(0, "====generateRelExprCode====\n");
         String var1 = null;
         String var2 = null;
         String relOp = null;
@@ -116,12 +118,12 @@ public class CodeGenerator {
                 }
             }
         }
-        System.out.println (var2+" "+relOp+" "+var1);
-        System.out.println("generateRelExprCode");
+        moonsb.insert(0, var2+" "+relOp+" "+var1 +"\n");
+        moonsb.insert(0, "generateRelExprCode\n");
     }
 
     private void generateStatementBlockCode(Node pnode) {
-        System.out.println(" ====generateStatementBlockCode==== ");
+        moonsb.insert(0, " ====generateStatementBlockCode==== \n");
         for(Node node: pnode.Children) {
             if (node.label.equals ("writeStatement")) {
                 generateWriteStatementCode (node);
@@ -139,7 +141,7 @@ public class CodeGenerator {
                 generateFcallStatementCode (node);
             }
         }
-        System.out.println("generateStatementBlockCode");
+        moonsb.insert(0, "generateStatementBlockCode\n");
     }
 
     private void generateFcallStatementCode(Node node) {
@@ -153,7 +155,7 @@ public class CodeGenerator {
                 fcallName = getVar0 (child);
             }
         }
-        System.out.println (fcallName+" "+aParams);
+        moonsb.insert(0, fcallName+" "+aParams + "\n");
     }
 
     private List<String> getAParams(Node node) {
@@ -170,7 +172,7 @@ public class CodeGenerator {
     }
 
     private void generateWhileStatementCode(Node node) {
-        System.out.println("====generateWhileStatementCode====");
+        moonsb.insert(0, "====generateWhileStatementCode====\n");
 
         for(Node child: node.Children) {
             if(child.label.equals("relExpr")) {
@@ -181,7 +183,7 @@ public class CodeGenerator {
             }
 
         }
-        System.out.println("generateWhileStatementCode");
+        moonsb.insert(0, "generateWhileStatementCode\n");
     }
 
     private void generateAssignStatementCode(Node node) {
@@ -201,7 +203,7 @@ public class CodeGenerator {
                 tempVar = tempVar = generateMultAddOp(child);
             }
         }
-        System.out.println (var+" = "+tempVar);
+        moonsb.insert(0, var+" = "+tempVar + "\n");
     }
 
     private String generateMultAddOp(Node node) {
@@ -239,10 +241,10 @@ public class CodeGenerator {
         }
         String tempvar = generateTempVar();
         if(node.label.equals("multOp")) {
-            System.out.println (tempvar+" = "+var2 + " " + opr + " " + var1);
+            moonsb.insert(0, tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         else if(node.label.equals("addOp")) {
-            System.out.println (tempvar+" = "+var2 + " " + opr + " " + var1);
+            moonsb.insert (0, tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         return tempvar;
     }
@@ -266,7 +268,7 @@ public class CodeGenerator {
                 id = child.value;
             }
         }
-        System.out.println (type+" "+id+dimList);
+        moonsb.insert(0, type+" "+id+dimList + "\n");
     }
 
     private String getDimList(Node node) {
@@ -278,12 +280,12 @@ public class CodeGenerator {
     }
 
     private void generateReadStatementCode(Node node) {
-        System.out.println ("read "+ getVariable(node.Children.get(0)));
+        moonsb.insert(0, "read "+ getVariable(node.Children.get(0)) + "\n");
     }
 
     private void generateWriteStatementCode(Node node) {
         //todo expr
-        System.out.println ("write "+ getDataMember(node.Children.get(0)));
+        moonsb.insert(0, "write "+ getDataMember(node.Children.get(0)) + "\n");
     }
 
     private String getDataMember(Node node) {
