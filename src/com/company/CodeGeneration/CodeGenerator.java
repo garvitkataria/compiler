@@ -4,6 +4,8 @@ import com.company.analyzer.Node;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class CodeGenerator {
@@ -123,7 +125,8 @@ public class CodeGenerator {
     }
 
     private void generateStatementBlockCode(Node pnode) {
-        moonsb.insert(0, " ====generateStatementBlockCode==== \n");
+        moonsb.append( "generateStatementBlockCode\n");
+        Collections.reverse (pnode.Children);
         for(Node node: pnode.Children) {
             if (node.label.equals ("writeStatement")) {
                 generateWriteStatementCode (node);
@@ -141,7 +144,8 @@ public class CodeGenerator {
                 generateFcallStatementCode (node);
             }
         }
-        moonsb.insert(0, "generateStatementBlockCode\n");
+        moonsb.append(" ====generateStatementBlockCode==== \n");
+
     }
 
     private void generateFcallStatementCode(Node node) {
@@ -203,7 +207,7 @@ public class CodeGenerator {
                 tempVar = tempVar = generateMultAddOp(child);
             }
         }
-        moonsb.insert(0, var+" = "+tempVar + "\n");
+        moonsb.append ( var+" = "+tempVar + "\n");
     }
 
     private String generateMultAddOp(Node node) {
@@ -241,16 +245,18 @@ public class CodeGenerator {
         }
         String tempvar = generateTempVar();
         if(node.label.equals("multOp")) {
-            moonsb.insert(0, tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
+            moonsb.append( tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         else if(node.label.equals("addOp")) {
-            moonsb.insert (0, tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
+            moonsb.append ( tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         return tempvar;
     }
     private static long idCounter = 0;
     private String generateTempVar() {
-        return String.valueOf("temp"+idCounter++);
+        String tempVar = "temp" + idCounter++;
+        moonsb.append ("integer " + tempVar+"\n");
+        return tempVar;
     }
 
     private void generateVarDeclCode(Node node) {
