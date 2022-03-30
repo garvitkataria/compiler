@@ -32,8 +32,10 @@ public class CodeGenerator {
     private void generateFuncDefCode(Node node) {
         String funcName = null;
         List<String> fparamList = null;
+        Collections.reverse (node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
+                moonsb.append("\n"+funcName+" "+fparamList + "\n");
                 generateStatementBlockCode(child);
             }
             else if(child.label.equals("fparamList")) {
@@ -43,7 +45,6 @@ public class CodeGenerator {
                 funcName = child.value;
             }
         }
-        moonsb.insert(0,funcName+" "+fparamList + "\n");
     }
 
     private List<String> getFparamList(Node node) {
@@ -160,7 +161,7 @@ public class CodeGenerator {
                 fcallName = getVar0 (child);
             }
         }
-        moonsb.insert(0, fcallName+" "+aParams + "\n");
+        moonsb.append( fcallName+" "+aParams + "\n");
     }
 
     private List<String> getAParams(Node node) {

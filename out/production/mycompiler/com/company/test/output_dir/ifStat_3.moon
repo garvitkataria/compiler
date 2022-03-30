@@ -5,12 +5,6 @@ integer n2
 n1 = 7
 n2 = 209
 generateIfStatementCode
-generateStatementBlockCode
-n = 2
- ====generateStatementBlockCode==== 
-generateStatementBlockCode
-n = 8
- ====generateStatementBlockCode==== 
 generateRelExprCode
 integer temp0
 temp0 = n2 + 9
@@ -22,6 +16,12 @@ integer temp3
 temp3 = temp2 * 100
 temp3 >= temp1
 ====generateRelExprCode====
+generateStatementBlockCode
+n = 8
+ ====generateStatementBlockCode==== 
+generateStatementBlockCode
+n = 2
+ ====generateStatementBlockCode==== 
 ====generateIfStatementCode====
 write n
  ====generateStatementBlockCode==== 
