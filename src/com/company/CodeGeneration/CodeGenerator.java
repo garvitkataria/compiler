@@ -87,7 +87,7 @@ public class CodeGenerator {
     }
 
     private void generateRelExprCode(Node node) {
-        moonsb.insert(0, "====generateRelExprCode====\n");
+        moonsb.append("generateRelExprCode\n");
         String var1 = null;
         String var2 = null;
         String relOp = null;
@@ -120,8 +120,8 @@ public class CodeGenerator {
                 }
             }
         }
-        moonsb.insert(0, var2+" "+relOp+" "+var1 +"\n");
-        moonsb.insert(0, "generateRelExprCode\n");
+        moonsb.append( var2+" "+relOp+" "+var1 +"\n");
+        moonsb.append("====generateRelExprCode====\n");
     }
 
     private void generateStatementBlockCode(Node pnode) {
@@ -176,8 +176,8 @@ public class CodeGenerator {
     }
 
     private void generateWhileStatementCode(Node node) {
-        moonsb.insert(0, "====generateWhileStatementCode====\n");
-
+        moonsb.append( "generateWhileStatementCode\n");
+        Collections.reverse(node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("relExpr")) {
                 generateRelExprCode(child);
@@ -187,7 +187,7 @@ public class CodeGenerator {
             }
 
         }
-        moonsb.insert(0, "generateWhileStatementCode\n");
+        moonsb.append("====generateWhileStatementCode====\n");
     }
 
     private void generateAssignStatementCode(Node node) {
