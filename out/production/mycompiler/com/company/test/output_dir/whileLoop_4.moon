@@ -3,14 +3,14 @@ generateStatementBlockCode
 integer i
 i = 0
 generateWhileStatementCode
-====generateRelExprCode====
-i < 10
 generateRelExprCode
+i < 10
+====generateRelExprCode====
 generateStatementBlockCode
 write i
 integer temp15
 temp15 = i + 1
 i = temp15
  ====generateStatementBlockCode==== 
-====generateWhileStatementCode====
- ====generateStatementBlockCode==== 
+====gen
+ ====generateStatementBlockCoderateWhileStatementCode====e====

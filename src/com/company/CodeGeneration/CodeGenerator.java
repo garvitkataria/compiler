@@ -74,7 +74,8 @@ public class CodeGenerator {
     }
 
     private void generateIfStatementCode(Node node) {
-        moonsb.insert(0, "====generateIfStatementCode====\n");
+        moonsb.append("generateIfStatementCode\n");
+        Collections.reverse (node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
                 generateStatementBlockCode(child);
@@ -83,7 +84,7 @@ public class CodeGenerator {
                 generateRelExprCode(child);
             }
         }
-        moonsb.insert(0, "generateIfStatementCode\n");
+        moonsb.append("====generateIfStatementCode====\n");
     }
 
     private void generateRelExprCode(Node node) {
