@@ -1,8 +1,8 @@
 main []
-integer arr[5][5]
-integer m
-integer n
 generateStatementBlockCode
+integer n
+integer m
+integer arr[5][5]
 m = 1
 n = 2
 arr[0][0] = 3

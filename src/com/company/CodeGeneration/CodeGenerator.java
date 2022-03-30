@@ -274,7 +274,7 @@ public class CodeGenerator {
                 id = child.value;
             }
         }
-        moonsb.insert(0, type+" "+id+dimList + "\n");
+        moonsb.append( type+" "+id+dimList + "\n");
     }
 
     private String getDimList(Node node) {
@@ -286,12 +286,12 @@ public class CodeGenerator {
     }
 
     private void generateReadStatementCode(Node node) {
-        moonsb.insert(0, "read "+ getVariable(node.Children.get(0)) + "\n");
+        moonsb.append("read "+ getVariable(node.Children.get(0)) + "\n");
     }
 
     private void generateWriteStatementCode(Node node) {
         //todo expr
-        moonsb.insert(0, "write "+ getDataMember(node.Children.get(0)) + "\n");
+        moonsb.append("write "+ getDataMember(node.Children.get(0)) + "\n");
     }
 
     private String getDataMember(Node node) {
