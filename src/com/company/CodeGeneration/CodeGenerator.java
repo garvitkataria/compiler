@@ -75,21 +75,25 @@ public class CodeGenerator {
     }
 
     private void generateIfStatementCode(Node node) {
-        moonsb.append("generateIfStatementCode\n");
+        moonsb.append("start generateIfStatementCode\n");
         Collections.reverse (node.Children);
+        int block = 1;
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
+                moonsb.append("start block " + block +"\n");
                 generateStatementBlockCode(child);
+                moonsb.append("end block " + block +"\n");
+                block++;
             }
             else if(child.label.equals("relExpr")) {
                 generateRelExprCode(child);
             }
         }
-        moonsb.append("====generateIfStatementCode====\n");
+        moonsb.append("end generateIfStatementCode\n");
     }
 
     private void generateRelExprCode(Node node) {
-        moonsb.append("generateRelExprCode\n");
+        moonsb.append("start generateRelExprCode\n");
         String var1 = null;
         String var2 = null;
         String relOp = null;
@@ -122,12 +126,12 @@ public class CodeGenerator {
                 }
             }
         }
-        moonsb.append( var2+" "+relOp+" "+var1 +"\n");
-        moonsb.append("====generateRelExprCode====\n");
+        moonsb.append( "condition# "+ var2+" "+relOp+" "+var1 +"\n");
+        moonsb.append("end generateRelExprCode \n");
     }
 
     private void generateStatementBlockCode(Node pnode) {
-        moonsb.append( "generateStatementBlockCode\n");
+        moonsb.append( "start generateStatementBlockCode\n");
         Collections.reverse (pnode.Children);
         for(Node node: pnode.Children) {
             if (node.label.equals ("writeStatement")) {
@@ -146,7 +150,7 @@ public class CodeGenerator {
                 generateFcallStatementCode (node);
             }
         }
-        moonsb.append(" ====generateStatementBlockCode==== \n");
+        moonsb.append("end generateStatementBlockCode\n");
 
     }
 
