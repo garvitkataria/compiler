@@ -151,7 +151,6 @@ public class CodeGenerator {
             }
         }
         moonsb.append("end generateStatementBlockCode\n");
-
     }
 
     private void generateFcallStatementCode(Node node) {
