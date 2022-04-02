@@ -6,5 +6,6 @@ func main() -> void {
        write(i);
        i = i + 1;
     };
+    write(i);
 }
 $

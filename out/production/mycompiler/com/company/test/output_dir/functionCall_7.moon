@@ -29,5 +29,5 @@ temp7 = i + 1
 i = temp7
 end generateStatementBlockCode
 ====generateWhileStatementCode====
-return n
+return 100
 end generateStatementBlockCode
