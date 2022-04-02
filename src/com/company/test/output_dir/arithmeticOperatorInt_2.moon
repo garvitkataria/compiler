@@ -8,10 +8,10 @@ integer n
 read a
 b = 3
 c = 2
-integer temp9
-temp9 = b * c
-integer temp10
-temp10 = a + temp9
-n = temp10
+integer temp3
+temp3 = b * c
+integer temp4
+temp4 = a + temp3
+n = temp4
 write n
 end generateStatementBlockCode
