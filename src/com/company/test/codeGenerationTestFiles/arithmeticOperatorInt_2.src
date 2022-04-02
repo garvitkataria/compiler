@@ -9,12 +9,15 @@ func main() -> void {
     arr[0][1] = 5;
 
     n = 8/2;
-
+    write(n);
     n = 1+2+3+4;
+    write(n);
     n = 1-2-3-4;
+    write(n);
     n = 1*2*3*4;
+    write(n);
     n = (n+(m*arr[0][0])*(arr[1][0]-7))/arr[0][1];
-
+    write(n);
 
 }
 $
