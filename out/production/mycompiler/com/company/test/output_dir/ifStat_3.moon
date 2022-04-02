@@ -1,32 +1,33 @@
 
-main []
-generateStatementBlockCode
+main [] : void
+start generateStatementBlockCode
 integer n1
 integer n2
+integer n
 n1 = 7
 n2 = 209
 start generateIfStatementCode
 start generateRelExprCode
-integer temp0
-temp0 = n2 + 9
-integer temp1
-temp1 = temp0 / 2
-integer temp2
-temp2 = n1 - 6
 integer temp3
-temp3 = temp2 * 100
-condition# temp3 >= temp1
+temp3 = n2 + 9
+integer temp4
+temp4 = temp3 / 2
+integer temp5
+temp5 = n1 - 6
+integer temp6
+temp6 = temp5 * 100
+condition# temp6 >= temp4
 end generateRelExprCode 
 start block 1
-generateStatementBlockCode
+start generateStatementBlockCode
 n = 8
- ====generateStatementBlockCode==== 
+end generateStatementBlockCode
 end block 1
 start block 2
-generateStatementBlockCode
+start generateStatementBlockCode
 n = 2
- ====generateStatementBlockCode==== 
+end generateStatementBlockCode
 end block 2
 end generateIfStatementCode
 write n
- ====generateStatementBlockCode==== 
+end generateStatementBlockCode

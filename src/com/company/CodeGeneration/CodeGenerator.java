@@ -31,11 +31,12 @@ public class CodeGenerator {
 
     private void generateFuncDefCode(Node node) {
         String funcName = null;
+        String type = null;
         List<String> fparamList = null;
         Collections.reverse (node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
-                moonsb.append("\n"+funcName+" "+fparamList + "\n");
+                moonsb.append("\n"+funcName+" "+fparamList + " : " + type + "\n");
                 generateStatementBlockCode(child);
             }
             else if(child.label.equals("fparamList")) {
@@ -43,6 +44,9 @@ public class CodeGenerator {
             }
             else if(child.label.equals("id")) {
                 funcName = child.value;
+            }
+            else if(child.label.equals("type")) {
+                type = child.value;
             }
         }
     }
@@ -148,9 +152,24 @@ public class CodeGenerator {
                 generateWhileStatementCode (node);
             } else if (node.label.equals ("fcallStatement")) {
                 generateFcallStatementCode (node);
+            } else if (node.label.equals ("returnStatement")) {
+                generateReturnStatement (node);
             }
         }
         moonsb.append("end generateStatementBlockCode\n");
+    }
+
+    private void generateReturnStatement(Node node) {
+        String var = null;
+        for(Node child: node.Children) {
+            if(child.label.equals("intlit")) {
+                var = child.value;
+            }
+            else if(child.label.equals("functionCall/DataMember")) {
+                var = getDataMember(child);
+            }
+        }
+        moonsb.append("return "+var+"\n");
     }
 
     private void generateFcallStatementCode(Node node) {

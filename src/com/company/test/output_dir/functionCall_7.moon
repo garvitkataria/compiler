@@ -1,5 +1,5 @@
 
-main []
+main [] : void
 start generateStatementBlockCode
 integer arr[7]
 arr[0] = 64
@@ -12,7 +12,7 @@ arr[6] = 90
 printarray [7, arr[7]]
 end generateStatementBlockCode
 
-printArray [integer size, integer arr[7]]
+printArray [integer size, integer arr[7]] : integer
 start generateStatementBlockCode
 integer n
 integer i
@@ -24,9 +24,10 @@ condition# i < n
 end generateRelExprCode 
 start generateStatementBlockCode
 write arr[i]
-integer temp4
-temp4 = i + 1
-i = temp4
+integer temp7
+temp7 = i + 1
+i = temp7
 end generateStatementBlockCode
 ====generateWhileStatementCode====
+return 100
 end generateStatementBlockCode

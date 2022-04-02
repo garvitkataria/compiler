@@ -1,6 +1,6 @@
 func main() -> void {
 
-    let n: integer;
+    let num: integer;
     let flag: integer;
     flag = 0;
 
