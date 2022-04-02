@@ -1,6 +1,5 @@
 func main() -> void {
     let n: integer;
-    r
     n = 1-2-3-4;
     write(n);
 }

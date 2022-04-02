@@ -1,9 +1,13 @@
 func main() -> void {
+    let n: integer;
+    let m: integer;
     let arr: integer[5][5];
+    m = 1;
+    n = 2;
     arr[0][0] = 3;
     arr[1][0] = 4;
     arr[0][1] = 5;
-    read()
+
     n = (n+(m*arr[0][0])*(arr[1][0]-7))/arr[0][1];
     write(n);
 

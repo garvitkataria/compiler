@@ -9,9 +9,15 @@ id REPTVARIABLE0 -> epsilon
 REPTVARIABLE2 -> epsilon
 assign ASSIGNOP -> equal
 intnum FACTOR -> intnum
-div MULTOP -> div
+mult MULTOP -> mult
+intnum FACTOR -> intnum
+mult MULTOP -> mult
+intnum FACTOR -> intnum
+mult MULTOP -> mult
 intnum FACTOR -> intnum
 RIGHTRECTERM -> epsilon
+RIGHTRECTERM -> MULTOP FACTOR RIGHTRECTERM
+RIGHTRECTERM -> MULTOP FACTOR RIGHTRECTERM
 RIGHTRECTERM -> MULTOP FACTOR RIGHTRECTERM
 TERM -> FACTOR RIGHTRECTERM
 RIGHTRECARITHEXPR -> epsilon
