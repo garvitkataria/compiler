@@ -1,10 +1,6 @@
 func main() -> void {
-    let n: integer;
     let s: integer[4][2][3];
-    let v: integer;
 
-    read(n);
-    write(n);
     read(s[0][0][0]);
     write(s[0][0][0]);
 }

@@ -1,0 +1,7 @@
+func main() -> void {
+    let n: integer;
+
+    read(n);
+    write(n);
+}
+$

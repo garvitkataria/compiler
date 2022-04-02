@@ -1,0 +1,7 @@
+func main() -> void {
+    let n: integer;
+
+    n = 8/2;
+    write(n);
+}
+$
