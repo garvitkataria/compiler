@@ -1,7 +1,12 @@
 func main() -> void {
+    let a: integer;
+    let b: integer;
+    let c: integer;
     let n: integer;
-
-    n = 8/2;
+    read(a);
+    b = 3;
+    c = 2;
+    n = a+b*c;
     write(n);
 }
 $
