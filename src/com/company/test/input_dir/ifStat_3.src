@@ -1,0 +1,11 @@
+func main() -> void {
+    let n: integer;
+    read(n);
+    if (n>5) then {
+        n = 1;
+    } else {
+        n = 0;
+    };
+    write(n);
+}
+$
