@@ -1,11 +1,8 @@
 func main() -> void {
     let x: integer;
     read(x);
-    if (x == 1) then {
-        x = 3;
-    } else {
-        x = 4;
-    };
-    write(x);
+    if (x == 3) then {
+        write(x);
+    } else;
 }
 $
