@@ -1,7 +1,7 @@
 func main() -> void {
     let i: integer;
 
-    read(i)
+    read(i);
     while(i < 7) {
        write(i);
        i = i + 1;
