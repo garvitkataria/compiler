@@ -1,6 +1,6 @@
 func main() -> void {
     let x: integer;
-    x = 3;
+    read(x);
     if (x == 1) then {
         x = 3;
     } else {
