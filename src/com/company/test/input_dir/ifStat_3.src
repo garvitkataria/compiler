@@ -2,10 +2,9 @@ func main() -> void {
     let n: integer;
     read(n);
     if (n>5) then {
-        n = 1;
+        write(1);
     } else {
-        n = 0;
+        write(0);
     };
-    write(n);
 }
 $
