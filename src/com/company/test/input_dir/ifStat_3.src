@@ -1,14 +1,11 @@
 func main() -> void {
-    let n: integer;
-    let a: integer;
-    let b: integer;
-    a = 1;
-    b = 0;
-    read(n);
-    if (n>5) then {
-        write(a);
+    let x: integer;
+    x = 3;
+    if (x == 1) then {
+        x = 3;
     } else {
-        write(b);
+        x = 4;
     };
+    write(x);
 }
 $
