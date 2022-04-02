@@ -6,9 +6,9 @@ func main() -> void {
     b = 0;
     read(n);
     if (n>5) then {
-        write(1);
+        write(a);
     } else {
-        write(0);
+        write(b);
     };
 }
 $
