@@ -14,6 +14,7 @@ public class SymbolTableGenerator {
         Node temp = new Node();
         temp = pNode;
         List<Node> listNodes = Find(pNode.Children, "STRUCTORIMPLORFUNCLIST").Children;
+
         for (Node node : listNodes) {
             node.m_symtab = InitializeDataTable();
             if(node.label.equals("structDecl")) {

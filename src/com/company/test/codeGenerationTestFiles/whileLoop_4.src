@@ -1,8 +1,8 @@
 func main() -> void {
     let i: integer;
 
-    read(i);
-    while(i == 7) {
+    i=3
+    while(i == 9) {
        write(i);
        i = i + 1;
     };

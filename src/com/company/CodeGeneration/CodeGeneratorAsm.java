@@ -39,7 +39,7 @@ public class CodeGeneratorAsm {
                 memorySize = Integer.parseInt (key.split(",")[2].trim());
             }
             else
-                size = VarOrParam.get (key);
+                size = VarOrParam.getOrDefault (key,0);
             if (memorySize > 1)
                 moon.write (key.split (",")[0].trim() + "      res " + (size * memorySize) + "\n");
             else
