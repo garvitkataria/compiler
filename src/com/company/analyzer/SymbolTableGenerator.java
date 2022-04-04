@@ -68,7 +68,7 @@ public class SymbolTableGenerator {
         Node memListNode = Find(node.Children, "memberList");
         for (Node childNode : memListNode.Children) {
             for (Node child : childNode.Children) {
-                if (child.label == "funcDecl")
+                if (child.label.equals("funcDecl"))
                 {
                     String visibility = Find(childNode.Children, "visibility").value;
                     String funcName = Find(child.Children, "id").value;
@@ -181,8 +181,8 @@ public class SymbolTableGenerator {
 
             if (!visibility.equals(""))
                 outsymboltables.write("  | " + visibility + "\n");
-                else
-            outsymboltables.write( "\n");
+            else
+                outsymboltables.write( "\n");
 
             outsymboltables.write("|    ==============================================================================\n");
             outsymboltables.write("|     | table: " + defnitionNode.value + "\n");
@@ -194,21 +194,26 @@ public class SymbolTableGenerator {
         }
         for (Node childNode: node.Children)
         {
-            if (childNode.label == "statementBlock")
+            if (childNode.label.equals ("statementBlock"))
             {
                 for (Node variableNode: childNode.Children)
                 {
-                    if (variableNode.label == "id")
+                    System.out.println ("variableNode.value "+variableNode.value+" "+variableNode.label);
+                    if (variableNode.label.equals ("varDecl"))
                     {
                         int variableNodeIndex = IndexOf(childNode.Children, variableNode);
-                        String type = childNode.Children.get (variableNodeIndex - 1).value;
-                        int dimListNodeCount = childNode.Children.get (variableNodeIndex - 2).Children.size();
+                        String idVal = variableNode.Children.get (2).value;
+                        String type = variableNode.Children.get (1).value;
+                        System.out.println ("idVal"+idVal);
+                        System.out.println ("variableNodetype"+variableNode.Children.get (1).value);
+                        System.out.println ("variableNodedimListNodeCount"+variableNode.Children.get (0).label);
+                        int dimListNodeCount = variableNode.Children.get (0).Children.size();
                         String dimListNode = "";
                         for (int i = 0; i < dimListNodeCount; i++)
                         {
                             dimListNode = dimListNode + "[]";
                         }
-                        outsymboltables.write("|     | local      | " + variableNode.value + "      | " + type + dimListNode + "\n");
+                        outsymboltables.write("|     | local      | " + idVal + "      | " + type + dimListNode + "\n");
 
                         if (rootClassNode == null)
                         {
@@ -216,7 +221,7 @@ public class SymbolTableGenerator {
                                 node.entry = tempNode.entry;
                             node.entry.ParameterType = "";
                             node.entry.ParameterName = "";
-                            node.entry.VariableName = variableNode.value;
+                            node.entry.VariableName = idVal;
                             node.entry.VariableType = type + dimListNode;
                             node.m_symtab = AddNewRow(node.m_symtab, node.entry);
                         }
@@ -246,7 +251,7 @@ public class SymbolTableGenerator {
     private int IndexOf(List<Node> children, Node variableNode) {
         int i=0;
         for(Node node:children) {
-            if(node == variableNode) return i;
+            if(node.equals(variableNode) ) return i;
             i++;
         }
         return -1;
@@ -255,7 +260,7 @@ public class SymbolTableGenerator {
     private Node WriteClassVariable(Node node, Node rootClassNode) throws IOException {
         for (Node childNode : node.Children) {
             for (Node child: childNode.Children) {
-                if (child.label == "varDecl") {
+                if (child.label.equals ("varDecl") ) {
                     String visibility = Find(childNode.Children, "visibility").value;
                     rootClassNode = WriteVariableTable(child, visibility, rootClassNode);
                 }

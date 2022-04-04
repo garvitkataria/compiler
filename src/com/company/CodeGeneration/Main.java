@@ -5,6 +5,7 @@ import com.company.analyzer.SymbolTableGenerator;
 import com.company.analyzer.SyntaxAnalysis;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
@@ -12,6 +13,7 @@ public class Main {
         FileWriter outderivation = null;
         FileWriter outast = null;
         FileWriter outsymboltables = null;
+        FileWriter intermediateasm = null;
         FileWriter moon = null;
         try {
             File folder = new File("src/com/company/test/input_dir");
@@ -30,6 +32,7 @@ public class Main {
                             outderivation = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outderivation");
                             outast = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outast");
                             outsymboltables = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".outsymboltables");
+                            intermediateasm = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".imt");
                             moon = new FileWriter("src/com/company/test/output_dir/"+filenameWithExt[0]+".moon");
                         } catch (IOException e) {
                             e.printStackTrace ();
@@ -52,19 +55,32 @@ public class Main {
                         symbolTableGenerator.PrintSymbolTable(syntaxAnalysis.root);
 
                         StringBuilder moonsb = new StringBuilder ();
-                        CodeGenerator codeGenerator = new CodeGenerator(moon, moonsb);
+                        CodeGenerator codeGenerator = new CodeGenerator(intermediateasm, moonsb);
                         codeGenerator.generate(syntaxAnalysis.root);
-                        moon.write (moonsb.toString ());
+                        intermediateasm.write (moonsb.toString ());
                     }
-                }
-                try {
-                    outderivation.close();
-                    outsyntaxerrors.close();
-                    outast.close ();
-                    outsymboltables.close();
-                    moon.close();
-                } catch (IOException e) {
-                    e.printStackTrace ();
+                    try {
+                        outderivation.close();
+                        outsyntaxerrors.close();
+                        outast.close ();
+                        outsymboltables.close();
+                        intermediateasm.close();
+                    } catch (IOException e) {
+                        e.printStackTrace ();
+                    }
+
+                    File imtfile = new File("src/com/company/test/output_dir/"+filenameWithExt[0]+".imt");
+                    CodeGeneratorAsm cda = new CodeGeneratorAsm(moon);
+                    Scanner scan = new Scanner (imtfile);
+                    while(scan.hasNextLine()){
+                        String temp = scan.nextLine ();
+                        cda.arrFileContent.add(temp);
+
+                    }
+                    scan.close ();
+                    moon.write("entry\n");
+                    cda.GenerateAssemblyCode();
+                    moon.close ();
                 }
             }
         }

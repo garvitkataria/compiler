@@ -36,7 +36,7 @@ public class CodeGenerator {
         Collections.reverse (node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
-                moonsb.append("\n"+funcName+" "+fparamList + " : " + type + "\n");
+                moonsb.append ("\n" + "start functionDef# " + funcName + " " + String.join(",", fparamList) + ":" + type + "\n");
                 generateStatementBlockCode(child);
             }
             else if(child.label.equals("fparamList")) {
@@ -49,6 +49,7 @@ public class CodeGenerator {
                 type = child.value;
             }
         }
+        moonsb.append("end functionDef# " + funcName + " " + String.join(",", fparamList) + "\n");
     }
 
     private List<String> getFparamList(Node node) {
@@ -79,21 +80,21 @@ public class CodeGenerator {
     }
 
     private void generateIfStatementCode(Node node) {
-        moonsb.append("start generateIfStatementCode\n");
+        moonsb.append("start generateIfStatementCode#" + "\n");
         Collections.reverse (node.Children);
         int block = 1;
         for(Node child: node.Children) {
             if(child.label.equals("statementBlock")) {
                 moonsb.append("start block " + block +"\n");
                 generateStatementBlockCode(child);
-                moonsb.append("end block " + block +"\n");
+                moonsb.append("end block " + block + "\n");
                 block++;
             }
             else if(child.label.equals("relExpr")) {
                 generateRelExprCode(child);
             }
         }
-        moonsb.append("end generateIfStatementCode\n");
+        moonsb.append("end generateIfStatementCode#" + "\n");
     }
 
     private void generateRelExprCode(Node node) {
@@ -183,7 +184,7 @@ public class CodeGenerator {
                 fcallName = getVar0 (child);
             }
         }
-        moonsb.append( fcallName+" "+aParams + "\n");
+        moonsb.append("funcCall# " + fcallName + " " + String.join(",", aParams) + "\n");
     }
 
     private List<String> getAParams(Node node) {
@@ -200,7 +201,7 @@ public class CodeGenerator {
     }
 
     private void generateWhileStatementCode(Node node) {
-        moonsb.append( "generateWhileStatementCode\n");
+        moonsb.append("start generateWhileStatementCode" + "\n");
         Collections.reverse(node.Children);
         for(Node child: node.Children) {
             if(child.label.equals("relExpr")) {
@@ -211,7 +212,7 @@ public class CodeGenerator {
             }
 
         }
-        moonsb.append("====generateWhileStatementCode====\n");
+        moonsb.append("end generateWhileStatementCode" + "\n");
     }
 
     private void generateAssignStatementCode(Node node) {
@@ -231,7 +232,7 @@ public class CodeGenerator {
                 tempVar = tempVar = generateMultAddOp(child);
             }
         }
-        moonsb.append ( var+" = "+tempVar + "\n");
+        moonsb.append ( "assignStatement# " + var+" = "+tempVar + "\n");
     }
 
     private String generateMultAddOp(Node node) {
@@ -269,17 +270,17 @@ public class CodeGenerator {
         }
         String tempvar = generateTempVar();
         if(node.label.equals("multOp")) {
-            moonsb.append( tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
+            moonsb.append("assignStatement# " + tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         else if(node.label.equals("addOp")) {
-            moonsb.append ( tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
+            moonsb.append ("assignStatement# " + tempvar+" = "+var2 + " " + opr + " " + var1 + "\n");
         }
         return tempvar;
     }
     private static long idCounter = 0;
     private String generateTempVar() {
         String tempVar = "temp" + idCounter++;
-        moonsb.append ("integer " + tempVar+"\n");
+        moonsb.append ("varDeclare# integer " + tempVar+"\n");
         return tempVar;
     }
 
@@ -298,7 +299,7 @@ public class CodeGenerator {
                 id = child.value;
             }
         }
-        moonsb.append( type+" "+id+dimList + "\n");
+        moonsb.append("varDeclare# " + type+" "+id+dimList + "\n");
     }
 
     private String getDimList(Node node) {
@@ -310,12 +311,12 @@ public class CodeGenerator {
     }
 
     private void generateReadStatementCode(Node node) {
-        moonsb.append("read "+ getVariable(node.Children.get(0)) + "\n");
+        moonsb.append("readStatement# " + "read "+ getVariable(node.Children.get(0)) + "\n");
     }
 
     private void generateWriteStatementCode(Node node) {
         //todo expr
-        moonsb.append("write "+ getDataMember(node.Children.get(0)) + "\n");
+        moonsb.append("writeStatement# " + "write "+ getDataMember(node.Children.get(0)) + "\n");
     }
 
     private String getDataMember(Node node) {
