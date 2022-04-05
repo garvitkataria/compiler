@@ -79,6 +79,7 @@ public class Main {
                     }
                     scan.close ();
                     moon.write("entry\n");
+                    moon.write("addi   r14,r0,topaddr  % Set stack pointer\n");
                     cda.GenerateAssemblyCode();
                     moon.close ();
                 }

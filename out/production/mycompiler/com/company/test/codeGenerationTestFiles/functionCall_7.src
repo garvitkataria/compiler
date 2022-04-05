@@ -1,0 +1,16 @@
+func printTillNum(size: integer) -> void
+{
+  let i: integer;
+  i = 1;
+  while (i<size) {
+    write(i);
+    i = i+1;
+  };
+}
+func main() -> void
+{
+  let x: integer;
+  x = 7;
+  printTillNum(x);
+}
+$

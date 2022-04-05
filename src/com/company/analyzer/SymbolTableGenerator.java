@@ -1,20 +1,24 @@
 package com.company.analyzer;
 
+import com.company.CodeGeneration.Common;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SymbolTableGenerator {
     FileWriter outsymboltables = null;
+    private String functionName;
+    HashMap<String, Integer> classSizeMap;
     public SymbolTableGenerator(FileWriter outsymboltables) {
         this.outsymboltables = outsymboltables;
+        classSizeMap = new HashMap<> ();
     }
 
     public Node PrintSymbolTable(Node pNode) throws IOException {
         Node temp = new Node();
         temp = pNode;
         List<Node> listNodes = Find(pNode.Children, "STRUCTORIMPLORFUNCLIST").Children;
-
+        Collections.reverse (listNodes);
         for (Node node : listNodes) {
             node.m_symtab = InitializeDataTable();
             if(node.label.equals("structDecl")) {
@@ -30,7 +34,17 @@ public class SymbolTableGenerator {
     private Node WriteClassTable(Node node, List<Node> listNodes) throws IOException {
         node.entry = new SymbolEntry();
         Node defnitionNode = Find(node.Children, "id");
-        outsymboltables.write("| class     | " + defnitionNode.value + "\n");
+        List<Node> classNodes = FindAll(node.Children, "memberList").get (0).Children;
+        int classMemory = 0;
+        for (Node memNode : classNodes)
+        {
+            for (Node classvar : memNode.Children)
+            {
+                if (classvar.label == "varDecl")
+                    classMemory = classMemory + Common.dictMemSize.get(Find(classvar.Children,"type").value);
+            }
+        }
+        outsymboltables.write("| class     | " + defnitionNode.value + "|     | " + classMemory + "\n");
         outsymboltables.write("|    ==============================================================================\n");
         outsymboltables.write("|     | table: " + defnitionNode.value + "\n");
         outsymboltables.write("|    ==============================================================================\n");
@@ -45,6 +59,9 @@ public class SymbolTableGenerator {
                 node.entry.NodeType = "Class";
                 node.entry.Name = defnitionNode.value;
                 node.entry.Inherits = inheritChildNode.value;
+                node.entry.size = classMemory;
+                System.out.println ("classMemory: "+ classMemory+" "+defnitionNode);
+                classSizeMap.put (defnitionNode.value, classMemory);
             }
             outsymboltables.write(inheritText + "\n");
         }
@@ -81,8 +98,10 @@ public class SymbolTableGenerator {
     }
 
     private Node WriteFunctionTable(Node node, List<Node> rootNodes, Node rootClassNode, String className, String visibility, String funcName) throws IOException {
+        functionName = "";
         if (className.equals("")) {
-            return MethodWriting(node, null, "", "");
+
+            return MethodWriting(node, null, "", "", rootNodes);
         }
         else {
             if (rootNodes != null) {
@@ -96,7 +115,7 @@ public class SymbolTableGenerator {
                         List<Node> listOfFuncDef = FindAll(funcDefListNode.Children,"funcDef");
                         for (Node funcDefNode : listOfFuncDef) {
                             if (Find(funcDefNode.Children, "id").value.equals(funcName))
-                                rootClassNode = MethodWriting(funcDefNode, rootClassNode, className, visibility);
+                                rootClassNode = MethodWriting(funcDefNode, rootClassNode, className, visibility, rootNodes);
                         }
                     }
                 }
@@ -106,7 +125,9 @@ public class SymbolTableGenerator {
     }
 
     private List<Node> FindAll(List<Node> rootNodes, String strEq) {
+
         List<Node> ll = new ArrayList<> ();
+        if(rootNodes == null) return ll;
         for(Node node: rootNodes) {
             if(node.label.equals(strEq)) {
                 ll.add(node);
@@ -115,10 +136,11 @@ public class SymbolTableGenerator {
         return ll;
     }
 
-    private Node MethodWriting(Node node, Node rootClassNode, String ClassName, String visibility) throws IOException {
+    private Node MethodWriting(Node node, Node rootClassNode, String ClassName, String visibility, List<Node> allNodes) throws IOException {
         Node defnitionNode = Find(node.Children, "id");
         Node defnitionType = Find(node.Children, "type");
         Node defnitionParam = Find(node.Children, "fparamList");
+        functionName = defnitionNode.value;
         Node tempNode = new Node();
         if (defnitionNode != null)
         {
@@ -182,8 +204,44 @@ public class SymbolTableGenerator {
 
             if (!visibility.equals(""))
                 outsymboltables.write("  | " + visibility + "\n");
-            else
-                outsymboltables.write( "\n");
+            List<Node> nodesForMemory = FindAll(FindAll(node.Children, "statementBlock").get(0).Children, "varDecl");
+            int memorySize = 0;
+            for (Node nodeMem : nodesForMemory)
+            {
+                if (nodeMem.Children.get (0).Children.size () > 0)
+                {
+                    int arraySize = 1;
+                    for (Node nodeArr : nodeMem.Children.get (0).Children)
+                    {
+                        arraySize = arraySize * Integer.parseInt (nodeArr.value);
+                    }
+                    memorySize = memorySize + (arraySize * Common.dictMemSize.get(nodeMem.Children.get (1).value));
+                }
+                else
+                {
+                    if (Common.dictMemSize.containsKey(nodeMem.Children.get (1).value))
+                        memorySize = memorySize + Common.dictMemSize.get(nodeMem.Children.get (1).value);
+                    else
+                    {
+                        List<Node> classNodes = FindAll(allNodes, "structDecl");
+                        for (Node classNode : classNodes)
+                        {
+                            if (FindAll(classNode.Children, "id").get(0).value.equals(nodeMem.Children.get (1).value))
+                            {
+                                for (SymbolEntry row : classNode.m_symtab.content)
+                                {
+                                    if (row.NodeType.equals("Class") && row.Name.equals (nodeMem.Children.get (1).value))
+                                    {
+                                        memorySize = memorySize + row.size;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            outsymboltables.write("      | " + memorySize + "\n");
 
             outsymboltables.write("|    ==============================================================================\n");
             outsymboltables.write("|     | table: " + defnitionNode.value + "\n");
@@ -210,11 +268,42 @@ public class SymbolTableGenerator {
                         System.out.println ("variableNodedimListNodeCount"+variableNode.Children.get (0).label);
                         int dimListNodeCount = variableNode.Children.get (0).Children.size();
                         String dimListNode = "";
+                        int arraySize = 1;
                         for (int i = 0; i < dimListNodeCount; i++)
                         {
-                            dimListNode = dimListNode + "[]";
+                            arraySize = arraySize * Integer.parseInt (variableNode.Children.get (0).Children.get (i).value);
+                            dimListNode = dimListNode + "[" + variableNode.Children.get (0).Children.get (i).value + "]";
                         }
-                        outsymboltables.write("|     | local      | " + idVal + "      | " + type + dimListNode + "\n");
+                        int memorySize = 0;
+                        if (Common.dictMemSize.containsKey(type.toLowerCase ().trim()))
+                        {
+                            memorySize = Common.dictMemSize.get(type.toLowerCase().trim());
+                        }
+                        else
+                        {
+                            List<Node> classNodes = FindAll(allNodes, "structDecl");
+                            for (Node classNode : classNodes)
+                            {
+                                if (FindAll(classNode.Children, "id").get(0).value.equals (type))
+                                {
+                                    for (SymbolEntry row : classNode.m_symtab.content)
+                                    {
+                                        if (row.NodeType.equals ("Class") && row.Name.equals (type) )
+                                        {
+                                            memorySize = memorySize + row.size;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(classSizeMap.containsKey (type)) {
+                            outsymboltables.write("|     | local      | " + idVal + "      | " + type + dimListNode + "      | " + (classSizeMap.get (type) * arraySize) + "\n");
+                        }
+                        else {
+                            outsymboltables.write("|     | local      | " + idVal + "      | " + type + dimListNode + "      | " + (memorySize * arraySize) + "\n");
+                        }
+
 
                         if (rootClassNode == null)
                         {
@@ -280,7 +369,8 @@ public class SymbolTableGenerator {
             rootClassNode.entry.VariableType = typeNode.value;
             rootClassNode.entry.VarVisibility = visibility;
             rootClassNode.m_symtab = AddNewRow(rootClassNode.m_symtab, rootClassNode.entry);
-            outsymboltables.write("|     | data      | " + idNode.value + "      | " + typeNode.value + "  | " + visibility + "\n");
+            int arraySize = 1;
+            outsymboltables.write("|     | data      | " + idNode.value + "      | " + typeNode.value + "  | " + visibility + "      | " + (Common.dictMemSize.get(typeNode.value.toLowerCase().trim()) * arraySize) + "\n");
         }
         return rootClassNode;
     }

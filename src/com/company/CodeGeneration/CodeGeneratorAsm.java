@@ -11,6 +11,7 @@ public class CodeGeneratorAsm {
     FileWriter moon;
     public HashMap<String, Integer> VarOrParam;
     private boolean isread;
+    private String functionName;
 
     public CodeGeneratorAsm(FileWriter moon)
     {
@@ -21,14 +22,24 @@ public class CodeGeneratorAsm {
 
     public void GenerateAssemblyCode() throws IOException {
         int nextContentToRead = 0;
+
+        int funcDefCount = 0;
+        for(String arrFileContentStr: arrFileContent) {
+            if(arrFileContentStr.contains("start functionDef#")) {
+                funcDefCount++;
+            }
+        }
+        if (funcDefCount > 1)
+        {
+            moon.write("j main" + "\n");
+        }
         int idx = 0;
-        System.out.println (arrFileContent);
         for (String item : arrFileContent)
         {
             nextContentToRead = ProcessingTags(item, idx, nextContentToRead, arrFileContent);
             idx++;
         }
-        moon.write ("hlt" + "\n");
+        //moon.write ("hlt" + "\n");
         for (String key : VarOrParam.keySet ())
         {
             int size = 0;
@@ -97,16 +108,16 @@ public class CodeGeneratorAsm {
                     if (rootBlockCode.get(rootBlockCode.size ()-1).equals("end generateWhileStatementCode") )
                     {
                         moon.write("gowhile1" + "\n");
-                        moon.write("lw r1," + operands[0].trim() + "(r0)" + "\n");
-                        moon.write("lw r2," + operands[1].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (VarOrParam.containsKey(functionName + operands[0].trim()) ? functionName + operands[0].trim() : operands[0].trim()) + "(r0)" + "\n");
+                        moon.write("lw r2," + (VarOrParam.containsKey(functionName + operands[1].trim()) ? functionName + operands[1].trim() : operands[1].trim()) + "(r0)" + "\n");
                         moon.write(compOpr + " r3,r1,r2" + "\n");
                         moon.write("bz r3,endwhile1" + "\n");
                         index = WhileStatementBlock1(index, rootBlockCode);
                     }
                     if (rootBlockCode.get(rootBlockCode.size ()-1).equals ("end generateIfStatementCode#"))
                     {
-                        moon.write("lw r1," + operands[0].trim() + "(r0)" + "\n");
-                        moon.write("lw r2," + operands[1].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (functionName + operands[0].trim()) + "(r0)" + "\n");
+                        moon.write("lw r2," + (functionName + operands[1].trim()) + "(r0)" + "\n");
                         moon.write(compOpr + " r3,r1,r2" + "\n");
                         moon.write("bz r3,block2" + "\n");
                         index = StatementBlock1(index, rootBlockCode);
@@ -120,14 +131,14 @@ public class CodeGeneratorAsm {
                     if (rootBlockCode.get(rootBlockCode.size()-1).equals("end generateWhileStatementCode"))
                     {
                         moon.write("gowhile1" + "\n");
-                        moon.write("lw r1," + operands[0].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (VarOrParam.containsKey(functionName + operands[0].trim()) ? functionName + operands[0].trim() : operands[0].trim()) + "(r0)" + "\n");
                         moon.write(compOpr + "i r2,r1," + operands[1].trim() + "\n");
                         moon.write("bz r2,endwhile1" + "\n");
                         index = WhileStatementBlock1(index, rootBlockCode);
                     }
                     if (rootBlockCode.get(rootBlockCode.size()-1).equals("end generateIfStatementCode#"))
                     {
-                        moon.write("lw r1," + operands[0].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (functionName + operands[0].trim()) + "(r0)" + "\n");
                         moon.write(compOpr + "i r2,r1," + operands[1].trim() + "\n");
                         moon.write("bz r2,block2" + "\n");
                         index = StatementBlock1(index, rootBlockCode);
@@ -141,6 +152,8 @@ public class CodeGeneratorAsm {
     }
 
     private int WhileStatementBlock1(int index, List<String> rootBlockCode) throws IOException {
+        if (!VarOrParam.containsKey("buf"))
+            VarOrParam.put("buf", 40);
         HashMap<String, Integer> temp = new HashMap<String, Integer>();
         List<String> blockCode = new ArrayList<> ();
         int nextContentToRead = 0;
@@ -169,6 +182,8 @@ public class CodeGeneratorAsm {
     }
 
     private int StatementBlock2(int index, List<String> rootBlockCode) throws IOException {
+        if (!VarOrParam.containsKey("buf"))
+            VarOrParam.put("buf", 40);
         HashMap<String, Integer> temp = new HashMap<>();
         List<String> blockCode = new ArrayList<> ();
         int nextContentToRead = 0;
@@ -226,80 +241,84 @@ public class CodeGeneratorAsm {
     private void GetReadStatementAssembly(String item) throws IOException {
         isread = true;
         String content = item.split("#")[1].trim();
-        moon.write("getc r1" + "\n");
-        if (content.split(" ")[1].contains("["))
+        if (!VarOrParam.containsKey("buf"))
         {
-            boolean keyExist = false;
-            int arrSize = 0;
-            int[] indexes = GetArrayIndexes(content.split(" ")[1].trim());
-            for (String key : VarOrParam.keySet ())
+            moon.write("getc r1" + "\n");
+            if (content.split(" ")[1].contains("["))
             {
-                if (key.split(",")[0].trim().equals (content.split(" ")[1].split("\\[")[0].trim()))
-                {
-                    keyExist = true;
-                    arrSize = VarOrParam.get(key);
-                    break;
-                }
-            }
-            if (!keyExist)
-            {
+                boolean keyExist = false;
+                int arrSize = 0;
+                int[] indexes = GetArrayIndexes(content.split(" ")[1].trim());
                 for (String key : VarOrParam.keySet ())
                 {
-                    if (key.split(",")[0].trim() == content.split(" ")[1].split("\\[")[0].trim())
+                    if (key.split(",")[0].trim().equals(content.split(" ")[1].split("\\[")[0].trim()))
                     {
                         keyExist = true;
                         arrSize = VarOrParam.get(key);
                         break;
                     }
                 }
+                if (!keyExist)
+                {
+                    for (String key : VarOrParam.keySet ())
+                    {
+                        if (key.split(",")[0].trim().equals(content.split(" ")[1].split("\\[")[0].trim()))
+                        {
+                            keyExist = true;
+                            arrSize = VarOrParam.get(key);
+                            break;
+                        }
+                    }
+                }
+                int reg = WriteArrayAssemblyCode(indexes, arrSize);
+                moon.write("sw " + content.split(" ")[1].trim().split("\\[")[0].trim() + "(r" + (reg - 1) + "),r1" + "\n");
             }
-            int reg = WriteArrayAssemblyCode(indexes, arrSize);
-            moon.write("sw " + content.split(" ")[1].trim().split("\\[")[0].trim() + "(r" + (reg - 1) + "),r1" + "\n");
+            else
+            {
+                moon.write("sw " + content.split(" ")[1].trim() + "(r0),r1" + "\n");
+            }
         }
-        else
-        {
-            moon.write("sw " + content.split(" ")[1].trim() + "(r0),r1" + "\n");
-        }
-
     }
 
     private void GetWriteStatementAssembly(String item) throws IOException {
         String content = item.split("#")[1].trim();
-        if (content.split(" ")[1].contains("["))
-        {
-            boolean keyExist = false;
-            int arrSize = 0;
-            int[] indexes = GetArrayIndexes(content.split(" ")[1].trim());
-            for (String key: VarOrParam.keySet ())
-            {
-                if (key.split(",")[0].trim() == content.split(" ")[1].split("\\[")[0].trim())
-                {
-                    keyExist = true;
-                    arrSize = VarOrParam.get(key);
-                    break;
-                }
-            }
-            if (!keyExist)
-            {
-                for (String key: VarOrParam.keySet ())
-                {
-                    if (key.split(",")[0].trim() == content.split(" ")[1].split("\\[")[0].trim())
-                    {
+        if (!VarOrParam.containsKey("buf")) {
+            if (content.split (" ")[1].contains ("[")) {
+                boolean keyExist = false;
+                int arrSize = 0;
+                int[] indexes = GetArrayIndexes (content.split (" ")[1].trim ());
+                for (String key : VarOrParam.keySet ()) {
+                    if (key.split (",")[0].trim ().equals (content.split (" ")[1].split ("\\[")[0].trim ()) ) {
                         keyExist = true;
-                        arrSize = VarOrParam.get(key);
+                        arrSize = VarOrParam.get (key);
                         break;
                     }
                 }
+                if (!keyExist) {
+                    for (String key : VarOrParam.keySet ())
+                    {
+                        if (key.split (",")[0].trim ().equals (content.split (" ")[1].split ("\\[")[0].trim ()) ) {
+                            keyExist = true;
+                            arrSize = VarOrParam.get(key);
+                            break;
+                        }
+                    }
+                }
+                int reg = WriteArrayAssemblyCode (indexes, arrSize);
+                moon.write("lw r1," + content.split (" ")[1].trim ().split ("\\[")[0].trim () + "(r" + (reg - 1) + ")" + "\n");
+            } else {
+                moon.write("lw r1," + content.split (" ")[1].trim () + "(r0)" + "\n");
             }
-            int reg = WriteArrayAssemblyCode(indexes, arrSize);
-            moon.write("lw r1," + content.split(" ")[1].trim().split("\\[")[0].trim() + "(r" + (reg - 1) + ")" + "\n");
+            moon.write ("putc r1" + "\n");
         }
-        else
-        {
-            moon.write("lw r1," + content.split(" ")[1].trim() + "(r0)" + "\n");
+        else {
+            moon.write("sw -8(r14),r1" + "\n");
+            moon.write("addi r1, r0, buf" + "\n");
+            moon.write("sw -12(r14),r1" + "\n");
+            moon.write("jl     r15,intstr" + "\n");
+            moon.write("sw -8(r14),r13" + "\n");
+            moon.write("jl     r15,putstr" + "\n");
         }
-
-        moon.write("putc r1" + "\n");
     }
 
     private void GetVarDeclareAssembly(String item)
@@ -319,11 +338,11 @@ public class CodeGeneratorAsm {
             int[] indexes = GetArrayIndexes(content.split(" ")[1].trim());
             int maxIndex = indexes[0];
             for(int ind: indexes) maxIndex = Math.max (maxIndex, ind);
-            VarOrParam.put(content.split(" ")[1].split("\\[")[0].trim() + "," + content.split(" ")[0].trim() + "," + memorySize, maxIndex);
+            VarOrParam.put(functionName + content.split(" ")[1].split("\\[")[0].trim() + "," + content.split(" ")[0].trim() + "," + memorySize, maxIndex);
         }
         else
         {
-            VarOrParam.put(content.split(" ")[1].trim(), Common.dictMemSize.get(content.split(" ")[0].trim()));
+            VarOrParam.put(functionName + content.split(" ")[1].trim(), Common.dictMemSize.get(content.split(" ")[0].trim()));
         }
     }
 
@@ -365,13 +384,13 @@ public class CodeGeneratorAsm {
             if (arrayIndexes != null && arrayIndexes.length > 0)
             {
                 int reg = WriteArrayAssemblyCode(arrayIndexes, arraysize);
-                moon.write ("lw r" + reg + "," + arrOperands[1].trim() + "(r0)" + "\n");
-                moon.write ("sw " + arrOperands[0].split("\\[")[0].trim() + "r" + (reg - 1) + ",r" + reg + "\n");
+                moon.write ( "lw r" + reg + "," + (functionName + arrOperands[1].trim()) + "(r0)" + "\n");
+                moon.write ("sw " + (functionName + arrOperands[0].split("\\[")[0].trim()) + "r" + (reg - 1) + ",r" + reg + "\n");
             }
             else
             {
-                moon.write ("lw r1," + arrOperands[1].trim() + "(r0)" + "\n");
-                moon.write ("sw " + arrOperands[0].trim() + "(r0),r1" + "\n");
+                moon.write ("lw r1," + (functionName + arrOperands[1].trim()) + "(r0)" + "\n");
+                moon.write ("sw " + (functionName + arrOperands[0].trim()) + "(r0),r1" + "\n");
             }
         }
         else
@@ -380,36 +399,44 @@ public class CodeGeneratorAsm {
             {
                 int reg = WriteArrayAssemblyCode(arrayIndexes, arraysize);
                 moon.write ("addi r1,r0," + arrOperands[1] + "\n");
-                moon.write ("sw " + arrOperands[0].split("\\[")[0].trim() + "(r" + (reg - 1) + "),r1" + "\n");
+                moon.write ("sw " + (functionName + arrOperands[0].split("\\[")[0].trim()) + "(r" + (reg - 1) + "),r1" + "\n");
             }
             else
             {
                 moon.write ("addi r1,r0," + arrOperands[1].trim() + "\n");
-                moon.write ( "sw " + arrOperands[0].trim() + "(r0),r1" + "\n");
+                moon.write ( "sw " + (functionName + arrOperands[0].trim()) + "(r0),r1" + "\n");
             }
         }
     }
     private int[] GetArrayIndexes(String v1)
     {
         String temp = v1.substring(v1.indexOf('[') + 1, v1.length ()-1);
-        System.out.println ("[][][]: "+temp);
+//        System.out.println ("[][][]: "+temp);
         String[] arrTemp = temp.split("]\\[");
+        List<String> result = new ArrayList<> ();
+        for (String item : arrTemp)
+        {
+            if (Common.lstAlphabets.contains((item.charAt(0)+"").toLowerCase()))
+                result.add("0");
+            else
+                result.add(item);
+        }
         int[] res = new int[arrTemp.length];
         int idx = 0;
-        for(String x: arrTemp) {
+        for(String x: result) {
             res[idx++] = Integer.parseInt (x);
         }
         return res;
     }
 
     private void GenerateAirthmeticAssembly(String leftOperand, String rightOperands, int[] leftArrayIndexes, String opr) throws IOException {
-        System.out.println (rightOperands);
-        System.out.println (opr);
+//        System.out.println (rightOperands);
+//        System.out.println (opr);
         String splitopr = "\\"+opr ;
-        System.out.println (splitopr);
+//        System.out.println (splitopr);
         String[] arrOperands = rightOperands.split(splitopr);
         String oprName = Common.dictOprName.get(opr);
-        System.out.println (oprName);
+//        System.out.println (oprName);
         int[] firstOperandReg = null;
         int[] secondOperandReg = null;
         int leftArraySize = 0;
@@ -438,7 +465,7 @@ public class CodeGeneratorAsm {
                 }
             }
         }
-        System.out.println (arrOperands.length);
+//        System.out.println (arrOperands.length);
         if (arrOperands[1].trim().contains("["))
         {
             secondOperandReg = GetArrayIndexes(arrOperands[1].trim());
@@ -460,69 +487,69 @@ public class CodeGeneratorAsm {
                     if (firstOperandReg != null && firstOperandReg.length > 0)
                     {
                         int result = WriteArrayAssemblyCode(firstOperandReg, rightOpr1ArraySize);
-                        moon.write("lw r1," + arrOperands[0].trim().split("\\[")[0] + "(r" + (result - 1) + ")" + "\n");
+                        moon.write("lw r1," + (functionName + arrOperands[0].trim().split("\\[")[0]) + "(r" + (result - 1) + ")" + "\n");
                     }
                     else
-                        moon.write("lw r1," + arrOperands[0].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (functionName + arrOperands[0].trim()) + "(r0)" + "\n");
                     if (secondOperandReg != null && secondOperandReg.length > 0)
                     {
                         int result = WriteArrayAssemblyCode(secondOperandReg, rightOpr2ArraySize);
-                        moon.write("lw r2," + arrOperands[1].trim().split("\\[")[0] + "(r" + (result - 1) + ")" + "\n");
+                        moon.write("lw r2," + (functionName + arrOperands[1].trim().split("\\[")[0]) + "(r" + (result - 1) + ")" + "\n");
                     }
                     else
-                        moon.write("lw r2," + arrOperands[1].trim() + "(r0)" + "\n");
+                        moon.write("lw r2," + (functionName + arrOperands[1].trim()) + "(r0)" + "\n");
                     moon.write(oprName + " r3,r1,r2" + "\n");
                     if (leftArrayIndexes != null && leftArrayIndexes.length > 0)
                     {
                         int result = WriteArrayAssemblyCode(leftArrayIndexes, leftArraySize);
-                        moon.write("sw " + leftOperand.split("\\[")[0] + "(r" + (result - 1) + "),r3" + "\n");
+                        moon.write("sw " + (functionName + leftOperand.split("\\[")[0]) + "(r" + (result - 1) + "),r3" + "\n");
                     }
                     else
-                        moon.write("sw " + leftOperand + "(r0),r3" + "\n");
+                        moon.write("sw " + (functionName + leftOperand) + "(r0),r3" + "\n");
                 }
                 else
                 {
                     if (firstOperandReg != null && firstOperandReg.length > 0)
                     {
                         int result = WriteArrayAssemblyCode(firstOperandReg, rightOpr1ArraySize);
-                        moon.write("lw r1," + arrOperands[0].trim().split("\\[")[0] + "(r" + (result - 1) + ")" + "\n");
+                        moon.write("lw r1," + (functionName + arrOperands[0].trim().split("\\[")[0]) + "(r" + (result - 1) + ")" + "\n");
                     }
                     else
-                        moon.write("lw r1," + arrOperands[0].trim() + "(r0)" + "\n");
+                        moon.write("lw r1," + (functionName + arrOperands[0].trim()) + "(r0)" + "\n");
                     moon.write(oprName + "i r2,r1," + arrOperands[1].trim() + "\n");
 
                     if (leftArrayIndexes != null && leftArrayIndexes.length > 0)
                     {
                         int result = WriteArrayAssemblyCode(leftArrayIndexes, leftArraySize);
-                        moon.write("sw " + leftOperand.split("\\[")[0] + "(r" + (result - 1) + "),r3" + "\n");
+                        moon.write("sw " + (functionName + leftOperand.split("\\[")[0]) + "(r" + (result - 1) + "),r3" + "\n");
                     }
                     else
-                        moon.write("sw " + leftOperand + "(r0),r2" + "\n");
+                        moon.write("sw " + (functionName + leftOperand) + "(r0),r2" + "\n");
                 }
             }
             else if (Common.lstAlphabets.contains((arrOperands[1].trim().charAt(0)+"").toLowerCase().trim()))
             {
-                moon.write("lw r1," + arrOperands[1].trim() + "(r0)" + "\n");
+                moon.write("lw r1," + (functionName + arrOperands[1].trim()) + "(r0)" + "\n");
                 if (secondOperandReg != null && secondOperandReg.length > 0)
                 {
                     int result = WriteArrayAssemblyCode(secondOperandReg, rightOpr2ArraySize);
-                    moon.write("lw r2," + arrOperands[1].trim().split("\\[")[0] + "(r" + (result - 1) + ")" + "\n");
+                    moon.write("lw r2," + (functionName + arrOperands[1].trim().split("\\[")[0]) + "(r" + (result - 1) + ")" + "\n");
                 }
                 else
                     moon.write(oprName + "i r2,r1," + arrOperands[0].trim() + "\n");
                 if (leftArrayIndexes != null && leftArrayIndexes.length > 0)
                 {
                     int result = WriteArrayAssemblyCode(leftArrayIndexes, leftArraySize);
-                    moon.write("sw " + leftOperand.split("\\[")[0] + "(r" + (result - 1) + "),r3" + "\n");
+                    moon.write("sw " + (functionName + leftOperand.split("\\[")[0]) + "(r" + (result - 1) + "),r3" + "\n");
                 }
                 else
-                    moon.write("sw " + leftOperand + "(r0),r2" + "\n");
+                    moon.write("sw " + (functionName + leftOperand) + "(r0),r2" + "\n");
             }
             else
             {
                 moon.write("addi r1,r0," + arrOperands[0].trim() + "\n");
                 moon.write(oprName + "i r2,r1," + arrOperands[1].trim() + "\n");
-                moon.write("sw " + leftOperand + "(r0),r2" + "\n");
+                moon.write("sw " + (functionName + leftOperand) + "(r0),r2" + "\n");
             }
         }
     }
@@ -642,8 +669,14 @@ public class CodeGeneratorAsm {
                         }
                         else
                         {
-                            moon.write("lw r" + (idx + 1) + "," + item + "(r0)" + "\n");
-                            moon.write("sw " + functionName + "p" + (idx + 1) + "(r0),r" + (idx + 1) + "\n");
+                            moon.write("lw r" + (idx + 1) + "," + (this.functionName + item) + "(r0)" + "\n");
+                            String xkey = null;
+                            for(String key: VarOrParam.keySet()) {
+                                if(key.contains (functionName)) {
+                                    xkey = key;
+                                }
+                            }
+                            moon.write("sw " + xkey + "(r0),r" + (idx + 1) + "\n");
                         }
                     }
                     else
@@ -684,9 +717,10 @@ public class CodeGeneratorAsm {
 
     private int GetFunctionDeclAssembly(int index, List<String> rootBlockCode) throws IOException {
         String functionSignature = rootBlockCode.get (index).split("#")[1].trim();
-        String functionName = functionSignature.split(" ")[0].trim();
+        functionName = functionSignature.split(" ")[0].trim();
         String[] parameters = functionSignature.split(functionName)[1].trim().split(":")[0].trim().split(",");
         String returnType = functionSignature.split(functionName)[1].trim().split(":")[1].trim();
+        moon.write(functionName + "\n");
 
         if (!returnType.equalsIgnoreCase ("void"))
             moon.write(functionName + "res res " + Common.dictMemSize.get(returnType.toLowerCase()) + "\n");
@@ -695,12 +729,12 @@ public class CodeGeneratorAsm {
         {
             if (item!=null && !item.isEmpty())
             {
-                if (item.split(" ")[1].trim().contains("["))
-                {
-                    moon.write(functionName + item.split(" ")[1].trim().split("\\[")[0] + " res " + Common.dictMemSize.get(item.split(" ")[0].trim().toLowerCase()) + "\n");
+                if (item.split(" ")[1].trim().contains("[")) {
+                    VarOrParam.put(functionName + item.split(" ")[1].trim().split("\\[")[0], Common.dictMemSize.get(item.split(" ")[0].trim().toLowerCase ()));
                 }
-                else
-                    moon.write(functionName + item.split(" ")[1].trim() + " res " + Common.dictMemSize.get(item.split(" ")[0].trim().toLowerCase()) + "\n");
+                else {
+                    VarOrParam.put(functionName + item.split(" ")[1].trim(), Common.dictMemSize.get(item.split(" ")[0].trim().toLowerCase()));
+                }
             }
         }
         List<String> blockCode = new ArrayList<> ();
@@ -727,7 +761,7 @@ public class CodeGeneratorAsm {
             }
             nextContentToRead = ProcessingTags(content, idx++, nextContentToRead, blockCode);
         }
-
+        moon.write("hlt" + "\n");
         return index;
     }
 }

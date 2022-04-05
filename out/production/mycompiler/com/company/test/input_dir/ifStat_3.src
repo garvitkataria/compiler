@@ -1,7 +1,7 @@
 func main() -> void {
     let x: integer;
-    read(x);
-    if (x == 3) then {
+    x=4;
+    if (x < 5) then {
         write(x);
     } else;
 }

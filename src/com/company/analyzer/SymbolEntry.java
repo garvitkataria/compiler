@@ -14,6 +14,7 @@ public class SymbolEntry {
     public String NodeVisibility;
     public String Inherits;
     public String ParentClass;
+    public int size;
 
     public SymbolEntry()
     {
@@ -47,6 +48,7 @@ public class SymbolEntry {
                 ", NodeVisibility='" + NodeVisibility + '\'' +
                 ", Inherits='" + Inherits + '\'' +
                 ", ParentClass='" + ParentClass + '\'' +
+                ", size=" + size +
                 '}';
     }
 }
