@@ -211,6 +211,8 @@ public class CodeGeneratorAsm {
     }
 
     private int StatementBlock1(int index, List<String> rootBlockCode) throws IOException {
+        if (!VarOrParam.containsKey("buf"))
+            VarOrParam.put("buf", 40);
         HashMap<String, Integer> temp = new HashMap<>();
         List<String> blockCode = new ArrayList<> ();
         int nextContentToRead = 0;
@@ -271,11 +273,11 @@ public class CodeGeneratorAsm {
                     }
                 }
                 int reg = WriteArrayAssemblyCode(indexes, arrSize);
-                moon.write("sw " + content.split(" ")[1].trim().split("\\[")[0].trim() + "(r" + (reg - 1) + "),r1" + "\n");
+                moon.write("sw " +  (functionName +  content.split(" ")[1].trim()).split("\\[")[0].trim() + "(r" + (reg - 1) + "),r1" + "\n");
             }
             else
             {
-                moon.write("sw " + content.split(" ")[1].trim() + "(r0),r1" + "\n");
+                moon.write("sw " +  (functionName + content.split(" ")[1].trim()) + "(r0),r1" + "\n");
             }
         }
     }
@@ -305,9 +307,9 @@ public class CodeGeneratorAsm {
                     }
                 }
                 int reg = WriteArrayAssemblyCode (indexes, arrSize);
-                moon.write("lw r1," + content.split (" ")[1].trim ().split ("\\[")[0].trim () + "(r" + (reg - 1) + ")" + "\n");
+                moon.write("lw r1," + (functionName +  content.split (" ")[1].trim ()).split ("\\[")[0].trim () + "(r" + (reg - 1) + ")" + "\n");
             } else {
-                moon.write("lw r1," + content.split (" ")[1].trim () + "(r0)" + "\n");
+                moon.write("lw r1," + (functionName +  content.split (" ")[1].trim ()) + "(r0)" + "\n");
             }
             moon.write ("putc r1" + "\n");
         }
@@ -674,6 +676,7 @@ public class CodeGeneratorAsm {
                             for(String key: VarOrParam.keySet()) {
                                 if(key.contains (functionName)) {
                                     xkey = key;
+                                    break;
                                 }
                             }
                             moon.write("sw " + xkey + "(r0),r" + (idx + 1) + "\n");
@@ -682,7 +685,14 @@ public class CodeGeneratorAsm {
                     else
                     {
                         moon.write("lw r" + (idx + 1) + "," + item + "(r0)" + "\n");
-                        moon.write("sw " + functionName + "p" + (idx + 1) + "(r0),r" + (idx + 1) + "\n");
+                        String xkey = null;
+                        for(String key: VarOrParam.keySet()) {
+                            if(key.contains (functionName)) {
+                                xkey = key;
+                                break;
+                            }
+                        }
+                        moon.write("sw " + xkey + "(r0),r" + (idx + 1) + "\n");
                     }
                 }
                 idx++;

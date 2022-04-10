@@ -1,8 +1,6 @@
 package com.company.CodeGeneration;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Common {
     public static String fileContent = "";
@@ -18,5 +16,6 @@ public class Common {
     public static HashMap<String, Integer> dictMemSize = new HashMap<String, Integer> () {{ put("integer", 4); put("float", 8); }};
     public static HashMap<String, String> dictOprName = new HashMap<String, String>() {{  put("+", "add"); put("-", "sub"); put("*", "mul"); put("/", "div"); }};
     public static HashMap<String, String> dictCompareOpr = new HashMap<String, String>() {{ put(" and ", "and"); put(" or ", "or"); put(" not ", "not"); put(" == ", "ceq"); put(" != ", "cne"); put(" <= ", "cle"); put(" < ", "clt"); put(" >= ", "cge"); put(" > ", "cgt");  }};
-
+    public static TreeSet<String> semanticErrors = new TreeSet<> ();
+    public static HashMap<String, String> dictTypes = new HashMap<String, String>() {{ put("intlit", "integer"); put("floatnum", "float"); }};
 }

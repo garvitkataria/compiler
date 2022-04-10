@@ -348,7 +348,8 @@ public class SymbolTableGenerator {
     }
 
     private Node WriteClassVariable(Node node, Node rootClassNode) throws IOException {
-        for (Node childNode : node.Children) {
+        Node memListNode = Find(node.Children, "memberList");
+        for (Node childNode : memListNode.Children) {
             for (Node child: childNode.Children) {
                 if (child.label.equals ("varDecl") ) {
                     String visibility = Find(childNode.Children, "visibility").value;

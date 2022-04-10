@@ -41,20 +41,20 @@ public class Table {
         return ll;
     }
 
-    public List<String> getDataParameterName(String value) {
+    public List<String> getDataParameterName(Node rootNode, String value) {
         List<String> ll = new ArrayList<> ();
-        for(SymbolEntry se: this.content) {
-            if(se.ParameterName == value)
-                ll.add(se.ParameterName);
+        for(SymbolEntry se: rootNode.m_symtab.content) {
+            if(se.ParameterName.equals (value))
+                ll.add(se.ParameterType);
         }
         return ll;
     }
 
-    public List<String> getDataVariableName(String value) {
+    public List<String> getDataVariableName(Node rootNode, String value) {
         List<String> ll = new ArrayList<> ();
-        for(SymbolEntry se: this.content) {
-            if(se.VariableName == value)
-                ll.add(se.VariableName);
+        for(SymbolEntry se: rootNode.m_symtab.content) {
+            if(se.VariableName.equals (value))
+                ll.add(se.VariableType);
         }
         return ll;
     }

@@ -54,16 +54,16 @@ impl LINEAR {
     new_function.b = B;
     return (new_function);
   }
-  func evaluate(x: float) -> float 
+  func evaluate(x: float) -> float
   {
     let result: float;
     result = 0.0;
     result = a * x + b;
     return (result);
   }
-} 
- 
-impl QUADRATIC { 
+}
+
+impl QUADRATIC {
   func evaluate(x: float) -> float
   {
     let result: float;
@@ -73,12 +73,12 @@ impl QUADRATIC {
     result = result * x + c;
     return (result);
   }
-  func build(A: float, B: float, C: float) -> QUADRATIC 
+  func build(A: float, B: float, C: float) -> QUADRATIC
   {
     let new_function: QUADRATIC ;
     new_function.a = A + B * 3;                                       // 10.1
     new_function.b = B;
-    new_function.c = 1;                                               // 10.2 
+    new_function.c = 1;                                               // 10.2
     return (1);                                                       // 10.3
   }
   func build2(A: float, B: float, C: float) -> QUADRATIC              // 6.1
@@ -90,8 +90,8 @@ impl QUADRATIC {
     return (new_function);
   }
 }
-  
-func f(i: integer) -> void {}                                                    
+
+func f(i: integer) -> void {}
 func f(i: integer) -> void {}                                        // 8.2
 func f(i: integer, j: integer) -> integer {}                         // 9.1
 
@@ -116,7 +116,7 @@ func main() -> void
   undefined();                                                      // 11.4
   counter = a;                                                      // 11.1
   f(1,1,1);                                                         // 12.1
-  f(1.2,1);                                                         // 12.2	
+  f(1.2,1);                                                         // 12.2
   i[2] = 1;                                                         // 13.1
   i[2][1.3] = 2;                                                    // 13.2
   f3(j);                                                            // 13.3
@@ -147,7 +147,7 @@ func main() -> void
 9.2  |X| Overloaded member function
 9.3  |X| Overridden inherited member function
 10.1 |X| Type error in expression
-10.2 |X| Type error in assignment statement 
+10.2 |X| Type error in assignment statement
 10.3 |X| Type error in return statement
 11.1 |X| Undeclared local variable
 11.2 |X| Undeclared data member

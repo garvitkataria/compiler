@@ -1,5 +1,7 @@
 package com.company.analyzer;
 
+import java.util.Objects;
+
 public class SymbolEntry {
 
 

@@ -1,0 +1,31 @@
+[error] Circular class dependency (inheritance cycles): at line 28
+[error] Circular class dependency (inheritance cycles): at line 32
+[error] Circular class dependency (inheritance cycles): at line 36
+[error] undefined member function declaration: at line 4
+[error] multiply declared class: at line 6
+[warning] overloaded member function: at line 7
+[error] multiply declared class: at line 6
+[warning] Overridden member function: at line 16
+[warning] Overridden member function: at line 16
+[error] multiply declared data member in class: at line 12
+[warning] Overridden member function: at line 25
+[warning] Overridden member function: at line 25
+[error] undeclared member function definition: at line 84
+[error] multiply declared free function: at line 95
+[warning] overloaded free function: at line 96
+[error] multiply declared free function: at line 95
+[warning] overloaded free function: at line 96
+[error] multiply declared free function: at line 95
+[warning] overloaded free function: at line 96
+[error] multiply declared identifier in function : at line 108
+[error] '.' operator used on non-class type: at line 123
+[error] Array parameter using wrong number of dimensions: at line 122
+[error] Array index is not an integer: at line 121
+[error] Use of array with wrong number of dimensions: at line 120
+[error] Function call with wrong type of parameters: at line 119
+[error] Function call with wrong number of parameters: at line 118
+[error] Undeclared variable (check for existence of local variable): at line 117
+[error] Undeclared free function: at line 116
+[error] Undeclared member function (search in class table): at line 115
+[error] Undeclared data member (search in class table): at line 114
+[error] undeclared class: at line 104
